@@ -1,0 +1,382 @@
+---
+title: "data-analysis-replication"
+author: "Jessica V"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+# Introduction
+
+The OVERALL OBJECTIVE of Legendre et al., 2016 was to estimate metabolic rates of fossil archosauromorphs (major group of diapsids, differentiated from the other diapsids by the presence of single openings in each side of the skull, in front of the eyes, among other characteristics) by performing a statistical predictive model using a new method of phylogenetic eigenvector maps on a set of bone histological features for a sample of extant and extinct vertebrates.
+
+
+TYPES OF DATA COLLECTED: The models were built using 57 specimens belonging to 14 extant species and 14 extinct species of tetrapods.
+
+Resting metabolic rates (RMR values) are taken from Montes et al. (2007), where growth rate was taken from juvinile specimens in vivo. (All variables, such as histological characters and metabolic were taken from the same specimen.) Bone histology sections were used for obtaining the following measurements: vascular density, osteocyte density, osteocyte shape, and osteocyte area—on each bone.
+
+Phylogeny relationships, topology and branch length, a well as inner relationships were all taken from published sources (Cubo et al. (2012), Legendre et al. (2013), Benton et al. 2015), Conrad (2008), Joyce et al. (2013),  Nesbitt (2011), and Crawford et al. (2015)).
+
+
+The MAIN RESULTS of the paper showed:
+1) that Mesozoic theropod dinosaurs exhibit metabolic rates very close to those found in modern birds
+2) that archosaurs share a higher ancestral metabolic rate than that of extant ectotherms
+3)that this derived high metabolic rate was acquired at a much more inclusive level of the phylogenetic tree, among non-archosaurian archosauromorphs.
+
+Additionally, these results highlight the difficulties of assigning a given heat production strategy, such as endothermy or ectothermy, to an estimated metabolic rate value. The results of the paper also confirmed findings from previous studies which state that the definition of the endotherm/ectotherm dichotomy may be ambiguous.
+
+ANALYSIS THEY DID
+
+
+The PEM approach was selected to estimate mass-specific RMR (in mL O2 h−1 g−0.67 )inthis study, using bone histological data and phylogenetic information.
+
+to convert the phylogeny into PEMs and predict values of the dependent variable for fossil species
+Three predictive models were compiledone for each of the three elements (femur, humerus, and tibia), to maintain a strict frame of homology.
+we reconstructed ancestral states of RMR from both observed and predicted values, using a phylogeny of our complete sample.
+
+#Replication
+
+I will replicate the components of their figure one in X separate images as they were all tied together using a program other than R. 
+
+I will be reanalizing their data where they reconstructed ancestral states of RMR from both observed and predicted values, using a phylogeny of our complete sample.
+
+
+#These are the packages that will be needed for this replication
+```{r}
+library(TreeTools)
+library(ape)
+library(ggplot2)
+library(tidyverse)
+library(ggtree)
+library(BiocManager)
+library(ggtree)
+library(phytools)
+library(maps)
+library(gridExtra)
+````
+
+## Visualization of Data
+
+Legendre et al., 2016 has made their data available at "https://datadryad.org/stash/dataset/doi:10.5061/dryad.2853k".
+
+The following data files were downloaded from Dryad to my computer: femurfilemeta.txt, humerusfilemeta.txt, tibiafilemeta.txt, Treecomplete.trees.nex, TreefemurMeta.nex,TreehumerusMeta.nex, TreetibiaMeta.nex.
+
+
+The files were loaded into R using the the "Files" tab and finding the files through my directory as indicated below. I titled each data by the bone it reffered to.
+
+[Include a view of the first few lines of the dataset plus any exploratory data analysis - e.g., overview of descriptive statistics included in the paper, plots, etc.]
+
+You should also demonstrate how you read in any data file(s) and show a few lines of raw data in your output (e.g., using head()).
+
+```{r}
+
+f<- "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/tibiafilemeta.txt"
+
+tibia <- read.delim(f, stringsAsFactors = FALSE, fileEncoding = "latin1")
+
+f<- "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/humerusfilemeta.txt"
+
+humerus <- read.delim(f, stringsAsFactors = FALSE, fileEncoding = "latin1")
+
+f<- "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/femurfilemeta.txt"
+
+femur <- read.delim(f, stringsAsFactors = FALSE, fileEncoding = "latin1")
+```
+
+
+Here I have loaded the complete tree data naming them by bone name and indicating it is a tree. Additional trees I have replicated that are not found in any fugures on the paper can be found below in the "Extra" section.
+
+```{r}
+
+t <- "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreefemurMeta.nex"
+
+
+# Here I read the NEXUS file
+femurtree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreefemurMeta.nex")
+# Here I convert the femurtree to a phylo object
+phylofemurtree <- as.phylo(femurtree)
+
+#BiocManager::install("ggtree")
+
+# Plot the phylo tree using ggtree, add tip labels and pply a tree-like theme
+ggtree(phylofemurtree) +
+  geom_tiplab() +  
+  theme_tree()     
+
+
+```
+TREE 2
+
+Humerus tree shown here.
+```{r}
+humerustree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreehumerusMeta.nex")
+
+phylohumerustree <- as.phylo(humerustree)
+
+
+ggtree(phylohumerustree) +
+  geom_tiplab() +  
+  theme_tree()   
+
+```
+TREE TIBIA
+
+```{r}
+tibiatree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreetibiaMeta.nex")
+
+phylotibiatree <- as.phylo(tibiatree)
+
+
+ggtree(phylotibiatree) +
+  geom_tiplab() +  
+  theme_tree()   
+```
+COMPLETE TREE
+This Tree I have labeled as maintree has correctly data that the paper is representing as figure one. is shown as figure  1 of the paper
+```{r}
+complete <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/Treecomplete.trees.nex")
+
+phylocomplete <- as.phylo(complete)
+
+
+Maintree <- ggtree(complete) +
+  geom_tiplab() +  
+  theme_tree() 
+
+Maintree
+```
+
+#HEre I visualize the tree as a Cladogram or rectangular layout as they do in the paper.
+
+#Cladogram. To visualize cladogram that without branch length scaling and only display the tree structure, branch.length is set to “none” and it works for all types of layouts
+
+```{r}
+LucasTree <- ggtree(phylocomplete, branch.length='none', layout="rectangular") + geom_tiplab() 
+
+LucasTree
+```
+In order to make my life easier I am changing the names of the collumn to RMR
+
+```{r}
+colnames(tibia)[2] <- "RMR"
+colnames(humerus)[2] <- "RMR"
+colnames(femur)[2] <- "RMR"
+
+colnames(tibia)
+colnames(humerus)
+```
+Here i combine all RMR form all bone datasets
+
+```{r}
+allRMR <- data.frame(RMR = c(femur$RMR, tibia$RMR, humerus$RMR))
+allSpecies <- data.frame(Species = c(femur$Species, tibia$Species, humerus$Species))
+allsSpeciesRMR <- cbind(allSpecies, allRMR)
+
+allSpeciesRMR <- drop_na(allsSpeciesRMR)
+
+allSpeciesRMR1 <- allSpeciesRMR %>% distinct(Species, .keep_all = TRUE)
+
+#(allSpeciesRMR1, aes(RMR, Species)+ geom_point())
+       
+#Fig1.2 <-
+  
+#(ggplot(allSpeciesRMR1, aes(x = RMR, y = Species)) + 
+  #geom_point(shape=0))
+ 
+
+#(ggplot(allSpeciesRMR1, aes(x = RMR, y = Species)) + 
+  #geom_point(shape=0, colour = "blue")) + geom_point(aes(fill = RMR< 1 "red"))      
+#Color try 2
+
+#allSpeciesRMR1 %>% mutate(Color = ifelse(C1 > 0, "blue", "red")) %>% +
+#ggplot(allSpeciesRMR1, aes(x = RMR, y = Species)) + 
+ # geom_point(shape=0, colour = "blue")     
+
+#USE PHYTOOLS
+#TRY 2
+ggplot(allSpeciesRMR1, aes(x = RMR, y = Species)) + 
+  geom_point(shape = 0, size = 4, aes(fill = RMR, colour = ifelse(RMR < 1, "blue", "red"))) +
+  scale_colour_identity() +
+  scale_fill_identity() +
+    scale_fill_gradient(low = "red", high = "red", breaks = c(0, 1, 3), labels = c("0", "1", "3"))+
+  guides(colour = FALSE) + 
+ theme_bw() + 
+  theme(legend.position="bottom", legend.key.size = unit(.5, "cm"),
+  legend.key.width = unit(2,"cm"))
+
+
+
+
+#ggplot(allSpeciesRMR1, aes(x= RMR, y=Species)) + geom_point(aes(fill = qsec)) + 
+ # scale_fill_gradient(colours = c("blue","purple","red"), 
+  #breaks=c(0,1,3), labels = format(c("0","1","3")))
+
+#GRADIENT
+ggplot(allSpeciesRMR1, aes(x= RMR, y=Species)) + geom_point(aes(fill = RMR)) + 
+geom_point(aes(fill = RMR)+ 
+  scale_fill_gradient(low = "red", high = "red", breaks = c(0, 1, 3), labels = c("0", "1", "3")))
+
+###
+       
+#(ggplot(allSpeciesRMR1, aes(x = RMR, y = Species)) + 
+ # geom_point(shape=0, colour = "blue")) + %>% mutate(Color = ifelse(C1 > 0, "green", "red")) %>%   
+       
+
+
+       
+#  geom_errorbarh(aes(xmax = resp + se, xmin = resp - se))
+```
+
+```{r}
+#here i add the data that was provided in the paper table but nor in the data on dryad but that is shown on Figure 1.
+
+Species <- c("Prolacerta broomi", "Proterosuchus fergusi", "Garjainia madiba", "Euparkeria capensis", "Rutiodon carolinensis", "Calyptosuchus wellesi", "Postosuchus kirkpatricki", "Lesothosaurus diagnosticus", "Maiasaura peeblesorum", "Thecodontosaurus antiquus", "Coelophysis bauri", "Lourinhanosaurus antunesi", "Allosaurus fragilis", "Troodon formosus")
+LL <- c(1.319254894,0.604057894, 1.093892708, 1.05448569, 0.308843779, 1.135032404, 1.165933134, 0.78543557, 0.532978612, 0.760912118, 7.44819231, 1.624566141, 3.680724942, 2.388193685)
+
+RMR<- c(1.779574478, 0.742796421, 1.428587942, 1.388275876, 0.395353151, 1.707702381, 1.864455587, 1.130079749, 0.861329988, 1.002164215, 11.83642213, 2.285600254, 5.889620032, 3.301842183)
+
+UL <- c(2.401309306, 0.914306682, 1.865918168, 1.827725139, 0.506094433, 2.569307738, 2.981470097, 1.630369802, 1.400681483, 1.319906895, 18.81005185, 3.215608472, 9.478280852, 4.56502413)
+
+missingspecies <- cbind(Species, LL, RMR, UL)
+missingspecies <- as.data.frame(missingspecies)
+
+fulldata<- (full_join(allSpeciesRMR1, missingspecies, by = "Species"))
+
+fulldata
+```
+## Statistical Replications/Reanalysis
+
+[Be sure to **thoroughly** explain what replications you are doing and comment your code so that it is easy for a reader to understand. Include in this section relevant tables/figures/values from the original paper for comparison to what you accomplished with your replication. Note that I want you to do the bulk of any *exposition* using text and markdown syntax outside of code blocks. That is, your document should not just be one big code block with ***R*** style comments but rather a nicely formatted report with code separated from exposition, interpretation, and dicussion.]
+
+## Summary/Discussion
+
+[Narrative section that overviews how successful were you at replicating the analyses and visualizations in the study. What problems did you encounter? Why might you have encountered those problems? What details were lacking from the original study's methods that might have hampered your ability to replicate the authors' results?]
+
+## References
+
+[Include the citation for your paper, plus any other literature you might reference.]
+
+Create a new RStudio project detailing your work on replicating the results presented in the paper you choose. 
+
+Note that I will be looking for you to clearly take your reader through all of the elements of data manipulation, analysis, and, if appropriate, visualization. You should provide as much coding detail, explanation, and output tables as necessary to compare your results to those published!
+
+You do not need to replicate ALL of the analyses presented in the paper (although the more the better)! At a bare minimum, you need to repeat at least three analyses, including at least one descriptive statistical analysis, one visualization, and one inferential statistical analysis.
+
+As assessment, I will be looking at several different elements of your report and code for this assignment. Below, I outline some of the main things:
+
+Organization and Logistics
+
+Repo set up on GitHub, named correctly, and shared with me (URL submitted via Canvas)
+PDF of paper included in the top level of the repository
+“.Rmd” or “.qmd” file for your report stored at the top level of the repo
+“.Rmd” or “.qmd” file includes text and code and embedded images/tables from the paper for comparison
+“.Rmd” or “.qmd” file well organized into subsections, including blocks of explanatory text and R code blocks, plus output
+R code follows a consistent convention with respect to variable and function names and formatting
+File(s) with original data included in a directory (folder) called “data” within the repo
+Images from the original paper that are referenced in the report stored in a separate directory called “images” within the repo
+Introduction and Framing
+
+Report includes a short, introductory description of the goal of the original paper, the data used, the analyses conducted, and the conclusions of the original study
+Report outlines the specific data and reanalyses you will be doing
+Code correctly loads all required packages not included in {base} R
+“.Rmd” or “.qmd” file renders and produces HTML output without requiring edits or additional modifications
+“.Rmd” or “.qmd” file defines variable names used in R code
+R code successfully reads in data file(s) from the local “data” directory within the repo and shows a few lines of raw data (e.g., using head())
+R code successfully reads in any image file(s) for comparison from within the local “image” directory within the repo
+Data Analysis/Visualization Replications
+
+For each of the analyses/visualizations being done…
+
+Text of the report clearly takes the reader through all of the elements of data manipulation/analysis/visualization, from raw data to presentation
+Report text is thorough and the R code is well-documented and provides as much explanation and output (tables, figures, etc.) as necessary to understand how the code works
+Report includes side-by-side comparisons of the results of the replication attempts to the published original results
+Discussion and Reflection
+
+Report includes a narrative summary about how successful the analysis replications were or were not - i.e., how well do the replicated results compare to those presented in the original paper?
+Report discusses and addresses any challenges encountered… missing data, unclear information about how data were processed in the original publication, etc.
+Report discusses where and possible reasons why the analysis replications might differ from the authors’ original results
+
+
+
+we reconstructed ancestral states of RMR from both observed and predicted values, 
+
+using a phylogeny of our complete sample. 
+
+Ancestral RMR values were estimated for all nodes using the function 
+
+fastAnc from the R package phytools (Revell 2012); this function compiles maximum likelihood ancestral states with 95% confidence intervals assuming a Brownian motion model, and
+```{r}
+#LucasTree1 <- read.tree("LucasTree")
+
+#fastAnc(phylocomplete,phylocomplete$edge.length, vars=FALSE, CI=FALSE)
+
+#edge_lengths <- setNames(phylocomplete$edge.length, phylocomplete$tip.label)
+
+#ancestral_states <- fastAnc(phylocomplete, edge_lengths, vars = FALSE, CI = FALSE)
+
+#edge_lengths <- edge_lengths[match(phylocomplete$tip.label, names(edge_lengths))]
+
+#ancestral_states <- fastAnc(phylocomplete, edge_lengths, vars = FALSE, CI = FALSE)
+
+#head(ancestral_states)
+
+#colnames(ancestral_states)
+## extract character of interest
+#fastAn <-log(setNames(phylocomplete$edge.legth,
+ #   rownames(phylocomplete)))
+
+
+#class(phylocomplete$edge.length)
+## estimate ancestral body sizes
+#fit.BM<-fastAnc(Maintree,ln.bodyMass,CI=TRUE)
+#print(fit.BM,printlen=10)
+
+
+
+#fastAnc(phylocomplete, x_ordered, vars = FALSE, CI = FALSE)
+
+#str(phylocomplete)
+#x_ordered <- phylocomplete$tip.label[match(phylocomplete, phylocomplete$tip.label)]
+
+#head(phylocomplete$tip.label)
+
+#any(is.na(phylocomplete$tip.label))
+
+#is.numeric(phlyocomplete$tip.label)
+#Nnode_ordered <- Nnode[match(complete$tip.label, names(Nnode))]
+#ancestralstates <- fastAnc(complete, complete$tip.label)
+
+#any(is.na(complete$tip.label))
+#is.nan(complete$tip.label)
+ 
+# is.infinite(complete$tip.label) 
+#  any(is.na(complete$edge.length)
+      
+#is.nan(complete$edge.length)
+ #is.infinite(complete$edge.length)
+ 
+# complete$tip.label <- as.character(complete$tip.label)
+ 
+
+```
+
+#Extra
+This section contains extra replications I have done for this project.
+I decided to replicate these trees although they were not in any figures on the paper because I thought it was a 
+
+```{r}
+t <- "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreefemurMeta.nex"
+
+
+# Here I read the NEXUS file
+femurtree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreefemurMeta.nex")
+# Here I convert the femurtree to a phylo object
+phylofemurtree <- as.phylo(femurtree)
+
+#BiocManager::install("ggtree")
+
+# Plot the phylo tree using ggtree, add tip labels and pply a tree-like theme
+ggtree(phylofemurtree) +
+  geom_tiplab() +  
+  theme_tree()  
+
+```
