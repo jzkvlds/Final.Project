@@ -5,26 +5,29 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
-# Introduction
+# *Introduction*
 
-The OVERALL OBJECTIVE of Legendre et al., 2016 was to estimate metabolic rates of fossil archosauromorphs (major group of diapsids, differentiated from the other diapsids by the presence of single openings in each side of the skull, in front of the eyes, among other characteristics) by performing a statistical predictive model using a new method of phylogenetic eigenvector maps on a set of bone histological features for a sample of extant and extinct vertebrates.
+*OBJECTIVE:*
+
+The overall objective of Legendre et al., 2016 was to estimate metabolic rates of fossil archosauromorphs (a ajor group of diapsids, differentiated from the other diapsids by the presence of single openings in each side of the skull, in front of the eyes, among other characteristics) by performing a statistical predictive model using a new method of phylogenetic eigenvector maps on a set of bone histological features for a sample of extant and extinct vertebrates.
 
 
-TYPES OF DATA COLLECTED: The models were built using 57 specimens belonging to 14 extant species and 14 extinct species of tetrapods.
+TYPES OF *DATA COLLECTED:*
+The models were built using 57 specimens belonging to 14 extant species and 14 extinct species of tetrapods.
 
 Resting metabolic rates (RMR values) are taken from Montes et al. (2007), where growth rate was taken from juvinile specimens in vivo. (All variables, such as histological characters and metabolic were taken from the same specimen.) Bone histology sections were used for obtaining the following measurements: vascular density, osteocyte density, osteocyte shape, and osteocyte area—on each bone.
 
 Phylogeny relationships, topology and branch length, a well as inner relationships were all taken from published sources (Cubo et al. (2012), Legendre et al. (2013), Benton et al. 2015), Conrad (2008), Joyce et al. (2013),  Nesbitt (2011), and Crawford et al. (2015)).
 
 
-The MAIN RESULTS of the paper showed:
+The *MAIN RESULTS* of the paper showed:
 1) that Mesozoic theropod dinosaurs exhibit metabolic rates very close to those found in modern birds
 2) that archosaurs share a higher ancestral metabolic rate than that of extant ectotherms
 3)that this derived high metabolic rate was acquired at a much more inclusive level of the phylogenetic tree, among non-archosaurian archosauromorphs.
 
 Additionally, these results highlight the difficulties of assigning a given heat production strategy, such as endothermy or ectothermy, to an estimated metabolic rate value. The results of the paper also confirmed findings from previous studies which state that the definition of the endotherm/ectotherm dichotomy may be ambiguous.
 
-ANALYSIS THEY DID
+*ANALYSIS* DONE
 
 
 The PEM approach was selected to estimate mass-specific RMR (in mL O2 h−1 g−0.67 )inthis study, using bone histological data and phylogenetic information.
@@ -33,7 +36,7 @@ to convert the phylogeny into PEMs and predict values of the dependent variable 
 Three predictive models were compiledone for each of the three elements (femur, humerus, and tibia), to maintain a strict frame of homology.
 we reconstructed ancestral states of RMR from both observed and predicted values, using a phylogeny of our complete sample.
 
-#Replication
+*ANALYSIS REPLICATED*
 
 I will replicate the components of their figure one in X separate images as they were all tied together using a program other than R. 
 
@@ -52,20 +55,22 @@ library(ggtree)
 library(phytools)
 library(maps)
 library(gridExtra)
-````
+library(MPSEM)
+library(evobiR)
+library(Metrics)
+```
 
-## Visualization of Data
+## *Visualization of Data*
 
 Legendre et al., 2016 has made their data available at "https://datadryad.org/stash/dataset/doi:10.5061/dryad.2853k".
 
 The following data files were downloaded from Dryad to my computer: femurfilemeta.txt, humerusfilemeta.txt, tibiafilemeta.txt, Treecomplete.trees.nex, TreefemurMeta.nex,TreehumerusMeta.nex, TreetibiaMeta.nex.
 
 
-The files were loaded into R using the the "Files" tab and finding the files through my directory as indicated below. I titled each data by the bone it reffered to.
+The files were loaded into R using the the "Files" tab and finding the files through my directory as indicated below. I titled each data by the bone it reffered to and viewed the head of the data.
 
 [Include a view of the first few lines of the dataset plus any exploratory data analysis - e.g., overview of descriptive statistics included in the paper, plots, etc.]
 
-You should also demonstrate how you read in any data file(s) and show a few lines of raw data in your output (e.g., using head()).
 
 ```{r}
 
@@ -73,88 +78,166 @@ f<- "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/tibiafilemeta.txt"
 
 tibia <- read.delim(f, stringsAsFactors = FALSE, fileEncoding = "latin1")
 
+head(tibia)
+
 f<- "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/humerusfilemeta.txt"
 
 humerus <- read.delim(f, stringsAsFactors = FALSE, fileEncoding = "latin1")
 
+head(humerus)
+
 f<- "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/femurfilemeta.txt"
 
 femur <- read.delim(f, stringsAsFactors = FALSE, fileEncoding = "latin1")
+
+head(femur)
 ```
 
+Here I have loaded the tree data naming them by bone name or complete and adding "tree" in the name.
 
-Here I have loaded the complete tree data naming them by bone name and indicating it is a tree. Additional trees I have replicated that are not found in any fugures on the paper can be found below in the "Extra" section.
+Additional trees I have replicated that are not found in any fugures on the paper can be found below in the "Extra" section.
 
 ```{r}
-
-t <- "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreefemurMeta.nex"
-
-
 # Here I read the NEXUS file
-femurtree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreefemurMeta.nex")
-# Here I convert the femurtree to a phylo object
-phylofemurtree <- as.phylo(femurtree)
-
-#BiocManager::install("ggtree")
-
-# Plot the phylo tree using ggtree, add tip labels and pply a tree-like theme
-ggtree(phylofemurtree) +
-  geom_tiplab() +  
-  theme_tree()     
-
-
-```
-TREE 2
-
-Humerus tree shown here.
-```{r}
-humerustree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreehumerusMeta.nex")
-
-phylohumerustree <- as.phylo(humerustree)
-
-
-ggtree(phylohumerustree) +
-  geom_tiplab() +  
-  theme_tree()   
-
-```
-TREE TIBIA
-
-```{r}
 tibiatree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreetibiaMeta.nex")
 
-phylotibiatree <- as.phylo(tibiatree)
+humerustree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreehumerusMeta.nex")
+
+femurtree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreefemurMeta.nex")
+
+completetree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/Treecomplete.trees.nex")
 
 
-ggtree(phylotibiatree) +
-  geom_tiplab() +  
-  theme_tree()   
+
 ```
+
 COMPLETE TREE
-This Tree I have labeled as maintree has correctly data that the paper is representing as figure one. is shown as figure  1 of the paper
+Here I start replicating the complete tree show in in Figure 1 of the paper.
+
 ```{r}
-complete <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/Treecomplete.trees.nex")
 
-phylocomplete <- as.phylo(complete)
+# Here I read the NEXUS file
+completetree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/Treecomplete.trees.nex")
 
+# Here I convert the femurtree to a phylo object
+phylocomplete <- as.phylo(completetree)
 
-Maintree <- ggtree(complete) +
+# Here I plot the phylo tree using ggtree, add tip labels (shows the species name in this case) and apply a tree-like theme, and name it Main Tree
+
+Maintree <- ggtree(phylocomplete) +
   geom_tiplab() +  
   theme_tree() 
 
-Maintree
+plot(Maintree)
+
 ```
 
-#HEre I visualize the tree as a Cladogram or rectangular layout as they do in the paper.
+Although the MAintree produced has the correct data, it does not look like the image in Figure 1 yet.
 
-#Cladogram. To visualize cladogram that without branch length scaling and only display the tree structure, branch.length is set to “none” and it works for all types of layouts
+#Here I visualize the tree as a Cladogram (or rectangular layout) as the paper does. Here I rotate each of the nodes individually and modify the lengths of the branches from the tree.
+
+
 
 ```{r}
-LucasTree <- ggtree(phylocomplete, branch.length='none', layout="rectangular") + geom_tiplab() 
+plot(phylocomplete)
 
-LucasTree
+L1<- rotate.multi(phylocomplete, 29)
+
+L1<- rotate.multi(L1, 30)
+L1<- rotate.multi(L1, 31)
+L1<- rotate.multi(L1, 32)
+L1<- rotate.multi(L1, 33)
+L1<- rotate.multi(L1, 34)
+L1<- rotate.multi(L1, 35)
+L1<- rotate.multi(L1, 36)
+L1<- rotate.multi(L1, 37)
+L1<- rotate.multi(L1, 38)
+L1<- rotate.multi(L1, 39)
+L1<- rotate.multi(L1, 40)
+L1<- rotate.multi(L1, 41)
+L1<- rotate.multi(L1, 42)
+L1<- rotate.multi(L1, 43)
+L1<- rotate.multi(L1, 44)
+L1<- rotate.multi(L1, 45)
+L1<- rotate.multi(L1, 46)
+L1<- rotate.multi(L1, 47)
+L1<- rotate.multi(L1, 48)
+L1<- rotate.multi(L1, 49)
+L1<- rotate.multi(L1, 50)
+L1<- rotate.multi(L1, 51)
+L1<- rotate.multi(L1, 52)
+L1<- rotate.multi(L1, 53)
+L1<- rotate.multi(L1, 54)
+L1<- rotate.multi(L1, 55)
+
+#after rotating nodes, L1 is in the same order as the paper
+plot(L1)
+
+#now we modify branch legth to 1
+LL1<-compute.brlen(L1, length =1)
+
+#LL1 now matched Figure 1 of the paper.
+plot(LL1)
+
+
 ```
-In order to make my life easier I am changing the names of the collumn to RMR
+
+DELETE THIS
+#```{r}
+
+#Here I visualize tree and call it LucasTree
+LucasTree <- ggtree(phylocomplete, branch.length='none') + geom_tiplab() 
+
+plot(LucasTree)
+
+
+
+complete <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/Treecomplete.trees.nex")
+
+
+LucasTree <- ggtree(complete, branch.length='none', layout="rectangular") + geom_tiplab() + theme_tree2()
+
+plot(complete)
+ggtree(complete) + geom_tiplab() 
+Arbol <- ggtree(complete, branch.length='none', layout="rectangular") + geom_tiplab()
+plot(Arbol)
+plot(LucasTree)
+plot(complete)
+
+plot(complete, use.edge.length=FALSE)
+nodelabels()
+
+
+plot(Rtree, use.edge.length=FALSE)
+nodelabels()
+
+
+plot(Rtree)
+(nodelabels(LucasTree)) 
+
+
+RRtree<-allRotations(tree)
+plot(RRtree)
+
+1+1
+rotateNodes(LucasTree, 29)
+###
+
+(ReorderData(LucasTree))
+
+orderedTree<-ReorderData(LucasTree, complete, taxa.names = "species")
+
+plot(orderedTree)
+
+(rotate(LucasTree, node = 9))
+
+plot(LucasTree, use.edge.length=FALSE)
+
+nodelabels()
+#complete[,c(2,4:6)]<-log(complete[,c(2,4:6)]); complete[,3]<-log1p(complete[,3])
+```
+
+In order to make my life easier I am changing the names of the Resting Metabolic Rate columns to "RMR"
 
 ```{r}
 colnames(tibia)[2] <- "RMR"
@@ -163,8 +246,9 @@ colnames(femur)[2] <- "RMR"
 
 colnames(tibia)
 colnames(humerus)
+colnames(femur)
 ```
-Here i combine all RMR form all bone datasets
+Here I combine all RMR all bone datasets. I combine all Species from all bone datasets. I cbind Species and RMR, removing NA's and duplicates.
 
 ```{r}
 allRMR <- data.frame(RMR = c(femur$RMR, tibia$RMR, humerus$RMR))
@@ -193,8 +277,10 @@ allSpeciesRMR1 <- allSpeciesRMR %>% distinct(Species, .keep_all = TRUE)
 
 #USE PHYTOOLS
 #TRY 2
+#Here I plot all of the RMR and Species,  using shapes and colors like the paper.
+
 ggplot(allSpeciesRMR1, aes(x = RMR, y = Species)) + 
-  geom_point(shape = 0, size = 4, aes(fill = RMR, colour = ifelse(RMR < 1, "blue", "red"))) +
+  geom_point(shape = 15, size = 4, aes(fill = RMR, colour = ifelse(RMR < 1, "blue", "red"))) +
   scale_colour_identity() +
   scale_fill_identity() +
     scale_fill_gradient(low = "red", high = "red", breaks = c(0, 1, 3), labels = c("0", "1", "3"))+
@@ -226,22 +312,84 @@ geom_point(aes(fill = RMR)+
 #  geom_errorbarh(aes(xmax = resp + se, xmin = resp - se))
 ```
 
+The data above only contains the data provided in the data from dryad.
+In order to have all of the data reported on Figure 1, I have manually added all of the Table 1 data below, and cbind them into a dataframe called missingspecies. I then join this data with the previous data above. into a dataframe called full data.
 ```{r}
 #here i add the data that was provided in the paper table but nor in the data on dryad but that is shown on Figure 1.
 
 Species <- c("Prolacerta broomi", "Proterosuchus fergusi", "Garjainia madiba", "Euparkeria capensis", "Rutiodon carolinensis", "Calyptosuchus wellesi", "Postosuchus kirkpatricki", "Lesothosaurus diagnosticus", "Maiasaura peeblesorum", "Thecodontosaurus antiquus", "Coelophysis bauri", "Lourinhanosaurus antunesi", "Allosaurus fragilis", "Troodon formosus")
-LL <- c(1.319254894,0.604057894, 1.093892708, 1.05448569, 0.308843779, 1.135032404, 1.165933134, 0.78543557, 0.532978612, 0.760912118, 7.44819231, 1.624566141, 3.680724942, 2.388193685)
-
 RMR<- c(1.779574478, 0.742796421, 1.428587942, 1.388275876, 0.395353151, 1.707702381, 1.864455587, 1.130079749, 0.861329988, 1.002164215, 11.83642213, 2.285600254, 5.889620032, 3.301842183)
+LL <- c(1.319254894,0.604057894, 1.093892708, 1.05448569, 0.308843779, 1.135032404, 1.165933134, 0.78543557, 0.532978612, 0.760912118, 7.44819231, 1.624566141, 3.680724942, 2.388193685)
 
 UL <- c(2.401309306, 0.914306682, 1.865918168, 1.827725139, 0.506094433, 2.569307738, 2.981470097, 1.630369802, 1.400681483, 1.319906895, 18.81005185, 3.215608472, 9.478280852, 4.56502413)
 
-missingspecies <- cbind(Species, LL, RMR, UL)
+missingspecies <- cbind(Species, RMR, LL, UL)
 missingspecies <- as.data.frame(missingspecies)
+colnames(missingspecies)
+colnames(allSpeciesRMR1)
+class(allSpeciesRMR1)
+class(missingspecies)
 
-fulldata<- (full_join(allSpeciesRMR1, missingspecies, by = "Species"))
+#convert to same type of data
+
+missingspecies <- mutate(missingspecies, RMR = as.double(RMR))
+
+
+fulldata<- (full_join(allSpeciesRMR1, missingspecies, by = c("RMR", "Species")))
 
 fulldata
+
+#Here I plot the full dataset,  using shapes and colors like the paper.
+#I understand that this paper was published before R packages were as advanced as they are now, thus the author created images outside of R. So this image has more similar colors to that of the image created outside of R
+
+ggplot(fulldata, aes(x = RMR, y = Species)) +
+  geom_point(shape = 15, size = 4, aes(fill = RMR, colour = ifelse(RMR < 1, "light blue", "red"))) +
+  labs( x = "Mass-specific resting metabolic rate") +
+scale_colour_identity() +
+  scale_fill_identity() +
+    scale_fill_gradient(low = "light blue", high = "red", breaks = c(0, 1, 2, 3, 6, 8, 10, 12), labels = c("0", "1", "2", "3", "6", "8", "10", "12"))+
+  guides(colour = FALSE) + 
+ theme_bw() + 
+  theme(legend.position="bottom", legend.key.size = unit(.5, "cm"),
+  legend.key.width = unit(2,"cm"))
+
+#Here I have created a second image using fill gradients 
+
+ggplot(fulldata, aes(x = RMR, y = Species)) + 
+  geom_point(shape = 22, size = 4, color = "black", aes(fill = RMR, colour = ifelse(RMR < 1, "light blue", "red"))) +
+  labs( x = "Mass-specific resting metabolic rate") +
+  scale_colour_identity() +
+  scale_fill_identity() +
+    scale_fill_gradient(low = "light blue", high = "red", breaks = c(0, 1, 2, 3, 6, 8, 10, 12), labels = c("0", "1", "2", "3", "6", "8", "10", "12"))+
+  guides(colour = FALSE) + 
+ theme_bw() + 
+ theme(plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), 
+                                "inches")) +
+    theme(legend.position="bottom", legend.key.size = unit(.1, "inches"),
+  legend.key.width = unit(1,"inches"))
+
+
+
+
+#Now we add the whiskers
+
+
+
+
+scale_fill_gradientn(colours=topo.colors(7),na.value = "transparent",
+                           breaks=c(0,0.5,1),labels=c("Minimum",0.5,"Maximum"),
+                           limits=c(0,1))
+
+
+
+
+
+
+
+
+
+scale_fill_gradientn(colours=topo.colors(7),na.value = "transparent")
+
 ```
 ## Statistical Replications/Reanalysis
 
@@ -379,4 +527,279 @@ ggtree(phylofemurtree) +
   geom_tiplab() +  
   theme_tree()  
 
+
 ```
+
+
+```{r}
+
+t <- "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreefemurMeta.nex"
+
+
+# Here I read the NEXUS file
+femurtree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreefemurMeta.nex")
+# Here I convert the femurtree to a phylo object
+phylofemurtree <- as.phylo(femurtree)
+
+#BiocManager::install("ggtree")
+
+# Plot the phylo tree using ggtree, add tip labels and pply a tree-like theme
+ggtree(phylofemurtree) +
+  geom_tiplab() +  
+  theme_tree()     
+
+plot(femurtree)
+plot(femurtree, use.edge.length=FALSE)
+nodelabels()
+
+femurtree<- rotate.multi(femurtree, 22)
+femurtree<- rotate.multi(femurtree, 23)
+femurtree<- rotate.multi(femurtree, 24)
+femurtree<- rotate.multi(femurtree, 25)
+femurtree<- rotate.multi(femurtree, 26)
+femurtree<- rotate.multi(femurtree, 27)
+femurtree<- rotate.multi(femurtree, 28)
+femurtree<- rotate.multi(femurtree, 29)
+femurtree<- rotate.multi(femurtree, 30)
+femurtree<- rotate.multi(femurtree, 31)
+femurtree<- rotate.multi(femurtree, 32)
+femurtree<- rotate.multi(femurtree, 33)
+femurtree<- rotate.multi(femurtree, 34)
+femurtree<- rotate.multi(femurtree, 35)
+femurtree<- rotate.multi(femurtree, 36)
+femurtree<- rotate.multi(femurtree, 37)
+femurtree<- rotate.multi(femurtree, 38)
+femurtree<- rotate.multi(femurtree, 39)
+femurtree<- rotate.multi(femurtree, 40)
+femurtree<- rotate.multi(femurtree, 41)
+```
+
+TREE 2
+
+Humerus tree shown here.
+```{r}
+humerustree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreehumerusMeta.nex")
+
+phylohumerustree <- as.phylo(humerustree)
+
+
+ggtree(phylohumerustree) +
+  geom_tiplab() +  
+  theme_tree()   
+
+```
+TREE TIBIA
+
+```{r}
+tibiatree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreetibiaMeta.nex")
+
+phylotibiatree <- as.phylo(tibiatree)
+
+
+ggtree(phylotibiatree) +
+  geom_tiplab() +  
+  theme_tree()   
+```
+
+
+PEM
+
+#```{r}
+
+#in order to extract PEM first I
+
+# Extract eigenvectors from the tree
+grloc <- getGraphLocations(LucasTree,phylocomplete[is.na(data[,"RMR"]),"species"])
+
+head(grloc)
+
+sporder <- match(attr(grloc$x,"vlabel")[grloc$x$vertex$species],phylocomplete[,"species"])
+
+#then I build the PME, here is a list of variables
+
+aux <- c("Vasc_density","Cell_density","Cell_size","Cell_shape")
+
+1+1
+
+PEMfs <- list()
+  for(m in aux) {
+    PEMfs[[m]] <- PEM.fitSimple(y=data[sporder,"RMR"],
+                                        x=data[sporder,m],w=grloc$x,d="distance",sp="species",lower=0,upper=1)
+  PEMfs[["none"]] <- PEM.fitSimple(y=data[sporder,"RMR"],
+                                           x=NULL,w=grloc$x,d="distance",sp="species",lower=0,upper=1)
+} ; rm(m)
+
+```
+RESTART
+#```{r}
+f<- "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/femurfilemeta.txt"
+
+femur <- read.delim(f, stringsAsFactors = FALSE, fileEncoding = "latin1")
+
+head(femur)c
+
+#Here I read the femus data as a table
+#f<- "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/femurfilemeta.txt"
+
+#femurdata<-read.table(f, header=T)
+
+#head(femur)
+
+t <- "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreefemurMeta.nex"
+
+#tabledata <- read.table(t, header = T)
+# Here I read the NEXUS file
+Ftree <- read.nexus(t)
+plot(Ftree)
+
+phyloftree <- as.phylo(Ftree)
+
+class(phyloftree)
+
+plot(phyloftree, use.edge.length=FALSE)
+nodelabels()
+
+finaltree <- ReorderData(Ftree, femur, taxa.names = "Species")
+
+plot(finaltree)
+ 
+femurtree2 <- read.tree(f)
+
+newfemurtree<- ggtree(Ftree, branch.length='none', layout="rectangular") + geom_tiplab() 
+
+plot(newfemurtree)
+
+rotateNodes(newfemurtree, 29)
+
+
+
+# Match the order of species in the dataset with that in the tree
+reorderedtree <- ReorderData(Ftree, femur, taxa.names = "Species")
+
+
+
+
+
+
+plot(reorderedtree)
+
+phyloreordered <- as.phylo(reorderedtree)
+
+plotTree(reordered)
+
+
+newfemur <- femur[1]<-femur[1]; femur[,c(2,4:6)]<-log(femur[,c(2,4:6)]); femur[,3]<-log1p(femur[,3])
+
+ ###
+# Here I convert the femurtree to a phylo object
+phylofemurtree <- as.phylo(femurtree)
+
+#BiocManager::install("ggtree")
+
+# Plot the phylo tree using ggtree, add tip labels and pply a tree-like theme
+ggtree(phylofemurtree) +
+  geom_tiplab() +  
+  theme_tree()   
+```
+
+
+#```{r}
+
+### PEM ###
+
+# Extract eigenvectors from the tree
+
+#Here I make the collumnb title easier into RMR
+colnames(femur)[2] <- "RMR"
+colnames(femur)[3] <- "vascular.density"
+colnames(femur)[4] <- "ost.density"
+colnames(femur)[5] <- "ost.area"
+colnames(femur)[6] <- "ost.shape"
+#here I log transform the data in columns 2,4,5,6  and # log1p(x) = ln(1+x) – convenient for null or very small values for collumn 3
+
+femur1 <- femur[,c(2,4:6)]<-log(femur[,c(2,4:6)]); femur[,3]<-log1p(femur[,3])
+
+Species <- (femur$Species)
+RMR <- log(femur$RMR)
+logVD <- log1p(femur$vascular.density)
+logROD <- log(femur$ost.density)
+logOA <- log(femur$ost.area)
+logOS <- log(femur$ost.shape)
+
+#here I combine all transformed data
+FEMURDATA <- cbind(Species, RMR, logVD, logROD, logOA, logOS)
+
+
+
+
+
+colnames(editedfemur)[1] <- "RMR"
+
+grloc <- getGraphLocations(Ftree,editedfemur[is.na(editedfemur[,"RMR"]),"Species"])
+
+
+
+sporder <- match(attr(grloc$x,"vlabel")[grloc$x$vertex$Species],editedfemur[,"Species"])
+
+
+
+
+```
+
+
+#```{r}
+PEM
+
+sum(is.na(FEMURDATA[, 1]))
+# Extract eigenvectors from the tree
+grloc <- getGraphLocations(LucasTree,FEMURDATA[is.na(FEMURDATA[,"RMR"]),"Species"])
+
+print(dim(FEMURDATA))
+subset_data <- FEMURDATA[is.na(FEMURDATA[,"RMR"]),"Species"]
+print(dim(subset_data))
+grloc <- getGraphLocations(LucasTree, subset_data)
+
+
+
+sporder <- match(attr(grloc$x,"vlabel")[grloc$x$vertex$species],data[,"species"])
+
+class(FEMURDATA)
+```
+
+
+Lucas
+#```{r}
+
+data<-read.delim(f, stringsAsFactors = FALSE, fileEncoding = "latin1")
+colnames(data)[2] <- "RMR"
+head(data)
+
+tree<- read.nexus(t)
+
+plot(tree)
+head(complete)
+grloc <- getGraphLocations(phylofemurtree,data[is.na(data[,"RMR"]),"Species"])
+
+phylofemurtree<- as.phylo(femurtree)
+
+head(femurtree)
+str(complete)
+
+SpecieswithNA <- c("Calyptosuchus wellesi", "Lesothosaurus diagnosticus",	
+"Troodon formosus", "Allosaurus fragilis","Rutiodon carolinensis", "Maiasaura peeblesorum",	
+"Proterosuchus fergusi")
+grloc <- getGraphLocations(complete, FEMURDATA)
+
+
+grloc <- getGraphLocations(LucasTree,FEMURDATA[,"RMR","Species"])
+
+
+
+str(tpall$Nnode)
+
+head(grloc)
+
+sporder <- match(attr(grloc$x,"vlabel")[grloc$x$vertex$Species],FEMURDATA[,"Species"])
+
+```
+
