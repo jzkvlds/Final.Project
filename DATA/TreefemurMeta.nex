@@ -1,0 +1,42 @@
+#NEXUS
+
+
+BEGIN TAXA;
+	TITLE Untitled_Block_of_Taxa;
+	DIMENSIONS NTAX=21;
+	TAXLABELS
+		Anas Cavia Chelodina Crocodylus Mus Pelodiscus Zootoca Podarcis Trachemys Varanusexa Varanusnil Microcebus Gallus Pleurodeles Calyptosuchus Lesothosaurus Troodon Allosaurus Rutiodon Maiasaura Proterosuchus 
+	;
+END;
+
+
+begin TREES;
+
+	TRANSLATE
+		1 Anas,
+		2 Cavia,
+		3 Chelodina,
+		4 Crocodylus,
+		5 Mus,
+		6 Pelodiscus,
+		7 Zootoca,
+		8 Podarcis,
+		9 Trachemys,
+		10 Varanusexa,
+		11 Varanusnil,
+		12 Microcebus,
+		13 Gallus,
+		14 Pleurodeles,
+		15 Calyptosuchus,
+		16 Lesothosaurus,
+		17 Troodon,
+		18 Allosaurus,
+		19 Rutiodon,
+		20 Maiasaura,
+		21 Proterosuchus;
+
+
+	TREE 'Edited, based on Edited, based on Default Symmetrical Tree++' = (14:337,((12:61.6,(2:56,5:56):5.6):256.4,(((7:5,8:5):150,(10:17,11:17):138):100.9,((3:151.7,(6:124,9:124):27.7):102.3,(21:1,(19:19.5,((15:19.5,4:228):19.1,((16:10.5,20:129.2):45.7,(18:63.5,(17:17.5,(1:66,13:66):17.5):125):38.5):0.1):0.4):4.7):1.8):1.9):62.1):19);
+end;
+
+
