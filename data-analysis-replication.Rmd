@@ -5,7 +5,9 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
-#  *Introduction*
+#  *PROJECT NOT YET COMPLETED loading up PDF and imnages now
+
+#   Introduction*
 
 # *OBJECTIVE:*
 
@@ -189,6 +191,12 @@ plot(L1)
 LL1<-compute.brlen(L1, length =1)
 
 plot(LL1)
+```
+
+This tree how looks like the Left side of Figure 1. Here I insert an image of Figure 1 to view for comparison.
+
+```{r}
+knitr::include_graphics("IMAGES/Legendre2016Figure1.png")
 ```
 
 Now that the tree is replicated I am moving onto the right part of Figure 1 (for the purposes of this report, I am calling this image replication Part 2).
@@ -388,6 +396,11 @@ plot(final)
 
 ```
 
+This plot how looks like the Right side of Figure 1. Here I insert an image of Figure 1 from the paper to view for comparison.
+```{r}
+knitr::include_graphics("IMAGES/Legendre2016Figure1.png")
+```
+```
 ANALYSIS REPLICATION
 
 #  *Discussion and Reflection*
@@ -596,27 +609,24 @@ ancestral_states <- fastAnc(phylocomplete, RMR, vars = FALSE, CI = FALSE)
 
 #ancestralstates <- fastAnc(complete, complete$tip.label)
 
-#Extra
-This section contains extra replications I have done for this project.
-I decided to replicate these trees although they were not in any figures on the paper because I thought it was a 
+#   Extra
+This section contains extra replications I have done for this project although they did not show up as figures on the paper.
+
+I once again read the NEXUS file, converted to phylo object, plotten tree using ggtree by adding tip labels and applyinga tree like theme.,
 
 ```{r}
 t <- "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreefemurMeta.nex"
 
 
-# Here I read the NEXUS file
 femurtree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreefemurMeta.nex")
-# Here I convert the femurtree to a phylo object
+
 phylofemurtree <- as.phylo(femurtree)
 
-#BiocManager::install("ggtree")
-
-# Plot the phylo tree using ggtree, add tip labels and pply a tree-like theme
-ggtree(phylofemurtree) +
+femurtreeplot <-(ggtree(phylofemurtree) +
   geom_tiplab() +  
-  theme_tree()  
+  theme_tree()  )
 
-
+plot(femurtreeplot)
 ```
 
 
@@ -625,14 +635,11 @@ ggtree(phylofemurtree) +
 t <- "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreefemurMeta.nex"
 
 
-# Here I read the NEXUS file
 femurtree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreefemurMeta.nex")
-# Here I convert the femurtree to a phylo object
+
 phylofemurtree <- as.phylo(femurtree)
 
-#BiocManager::install("ggtree")
 
-# Plot the phylo tree using ggtree, add tip labels and pply a tree-like theme
 ggtree(phylofemurtree) +
   geom_tiplab() +  
   theme_tree()     
@@ -663,7 +670,6 @@ femurtree<- rotate.multi(femurtree, 40)
 femurtree<- rotate.multi(femurtree, 41)
 ```
 
-TREE 2
 
 Humerus tree shown here.
 ```{r}
@@ -672,12 +678,13 @@ humerustree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJE
 phylohumerustree <- as.phylo(humerustree)
 
 
-ggtree(phylohumerustree) +
+humerustreeplot <- (ggtree(phylohumerustree) +
   geom_tiplab() +  
-  theme_tree()   
+  theme_tree()   )
 
+plot(humerustreeplot)
 ```
-TREE TIBIA
+Tibia Tree plotted below
 
 ```{r}
 tibiatree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreetibiaMeta.nex")
@@ -685,9 +692,11 @@ tibiatree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT
 phylotibiatree <- as.phylo(tibiatree)
 
 
-ggtree(phylotibiatree) +
+tibiatreeplot <-(ggtree(phylotibiatree) +
   geom_tiplab() +  
-  theme_tree()   
+  theme_tree())
+
+plot(tibiatreeplot)
 ```
 
 
@@ -856,16 +865,7 @@ class(FEMURDATA)
 ```
 
 
-Lucas
-#```{r}
 
-data<-read.delim(f, stringsAsFactors = FALSE, fileEncoding = "latin1")
-colnames(data)[2] <- "RMR"
-head(data)
-
-tree<- read.nexus(t)
-
-plot(tree)
 head(complete)
 grloc <- getGraphLocations(phylofemurtree,data[is.na(data[,"RMR"]),"Species"])
 
