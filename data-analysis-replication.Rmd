@@ -400,7 +400,7 @@ This plot how looks like the Right side of Figure 1. Here I insert an image of F
 ```{r}
 knitr::include_graphics("IMAGES/Legendre2016Figure1.png")
 ```
-```
+
 ANALYSIS REPLICATION
 
 #  *Discussion and Reflection*
@@ -431,57 +431,14 @@ Ancestral RMR values were estimated for all nodes using the function fastAnc fro
 
 [Narrative section that overviews how successful were you at replicating the analyses and visualizations in the study. What problems did you encounter? Why might you have encountered those problems? What details were lacking from the original study's methods that might have hampered your ability to replicate the authors' results?]
 
-## References
+#  References
+Citing the dataset:
+Legendre, Lucas J.; Guénard, Guillaume; Botha-Brink, Jennifer; Cubo, Jorge (2016). Data from: Palaeohistological evidence for ancestral high metabolic rate in archosaurs [Dataset]. Dryad. https://doi.org/10.5061/dryad.2853k
 
-[Include the citation for your paper, plus any other literature you might reference.]
-
-Create a new RStudio project detailing your work on replicating the results presented in the paper you choose. 
-
-Note that I will be looking for you to clearly take your reader through all of the elements of data manipulation, analysis, and, if appropriate, visualization. You should provide as much coding detail, explanation, and output tables as necessary to compare your results to those published!
-
-You do not need to replicate ALL of the analyses presented in the paper (although the more the better)!
-
-As assessment, I will be looking at several different elements of your report and code for this assignment. Below, I outline some of the main things:
-
-Organization and Logistics
-
-Repo set up on GitHub, named correctly, and shared with me (URL submitted via Canvas)
-PDF of paper included in the top level of the repository
-“.Rmd” or “.qmd” file for your report stored at the top level of the repo
-“.Rmd” or “.qmd” file includes text and code and embedded images/tables from the paper for comparison
-“.Rmd” or “.qmd” file well organized into subsections, including blocks of explanatory text and R code blocks, plus output
-R code follows a consistent convention with respect to variable and function names and formatting
-File(s) with original data included in a directory (folder) called “data” within the repo
-Images from the original paper that are referenced in the report stored in a separate directory called “images” within the repo
-Introduction and Framing
-
-Report includes a short, introductory description of the goal of the original paper, the data used, the analyses conducted, and the conclusions of the original study
-Report outlines the specific data and reanalyses you will be doing
-Code correctly loads all required packages not included in {base} R
-“.Rmd” or “.qmd” file renders and produces HTML output without requiring edits or additional modifications
-“.Rmd” or “.qmd” file defines variable names used in R code
-R code successfully reads in data file(s) from the local “data” directory within the repo and shows a few lines of raw data (e.g., using head())
-R code successfully reads in any image file(s) for comparison from within the local “image” directory within the repo
-Data Analysis/Visualization Replications
-
-For each of the analyses/visualizations being done…
-
-Text of the report clearly takes the reader through all of the elements of data manipulation/analysis/visualization, from raw data to presentation
-Report text is thorough and the R code is well-documented and provides as much explanation and output (tables, figures, etc.) as necessary to understand how the code works
-Report includes side-by-side comparisons of the results of the replication attempts to the published original results
-Discussion and Reflection
-
-Report includes a narrative summary about how successful the analysis replications were or were not - i.e., how well do the replicated results compare to those presented in the original paper?
-Report discusses and addresses any challenges encountered… missing data, unclear information about how data were processed in the original publication, etc.
-Report discusses where and possible reasons why the analysis replications might differ from the authors’ original results
+Citing the paper:
+Lucas J. Legendre, Guillaume Guénard, Jennifer Botha-Brink, Jorge Cubo, Palaeohistological Evidence for Ancestral High Metabolic Rate in Archosaurs, Systematic Biology, Volume 65, Issue 6, November 2016, Pages 989–996, https://doi.org/10.1093/sysbio/syw033
 
 
-
-we reconstructed ancestral states of RMR from both observed and predicted values, 
-
-using a phylogeny of our complete sample. 
-
-Ancestral RMR values were estimated for all nodes using the function 
 
 fastAnc from the R package phytools (Revell 2012); this function compiles maximum likelihood ancestral states with 95% confidence intervals assuming a Brownian motion model, and
 
@@ -890,6 +847,4 @@ head(grloc)
 
 sporder <- match(attr(grloc$x,"vlabel")[grloc$x$vertex$Species],FEMURDATA[,"Species"])
 
-```
-[Include a view of the first few lines of the dataset plus any exploratory data analysis - e.g., overview of descriptive statistics included in the paper, plots, etc.]
 
