@@ -98,41 +98,44 @@ femur <- read.delim(f, stringsAsFactors = FALSE, fileEncoding = "latin1")
 head(femur)
 ```
 
-Here I have loaded the tree data naming them by the component (tibia, humerus, femus, or complete) and adding "tree" in the name.
+Here I have loaded the tree data  by reading the NEXUS file and naming them by the component (tibia, humerus, femus, or complete) and adding "tree" in the name.
 
 Additional trees I have replicated that are not found in any figures on the paper can be found below in the "Extra" section.
 
 ```{r}
-# Here I read the NEXUS file for the trees
 tibiatree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreetibiaMeta.nex")
 
-#Here I view the first lines of the data
 head(tibiatree)
 
 humerustree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreehumerusMeta.nex")
+
 head(humerustree)
 
 femurtree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreefemurMeta.nex")
+
 head(femurtree)
 
-completetree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/Treecomplete.trees.nex")
+completetree <- read.nexus(file =   "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/Treecomplete.trees.nex")
+
 head(completetree)
 
 
 ```
 
-COMPLETE TREE
+COMPLETE TREE:
 Here I start replicating the complete tree show in in Figure 1 of the paper.
+I made sure the NEXUS file was loaded.
+
+I converter the complete tree into a phylo object.
+
+I plotted the phylo tree using ggtree, add tip labels (shows the species name in this case) and apply a tree-like theme, and name it Main Tree
 
 ```{r}
 
-# As a reminder this is how to load a NEXUS file
 completetree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/Treecomplete.trees.nex")
 
-# Here I convert the femurtree to a phylo object in order to view using ggtree
 phylocomplete <- as.phylo(completetree)
 
-# Here I plot the phylo tree using ggtree, add tip labels (shows the species name in this case) and apply a tree-like theme, and name it Main Tree
 
 Maintree <- ggtree(phylocomplete) +
   geom_tiplab() +  
@@ -144,9 +147,9 @@ plot(Maintree)
 
 Although the Maintree produced has the correct data, it does not look like the image in Figure 1 yet.
 
-Here I rotate each of the nodes individually. (Note: I use the phylo  object in order to be able to rotate the nodes using the rotate.multi function).
+Here I rotate each of the nodes individually. (Note: I use the phylo  object in order to be able to rotate the nodes using the rotate.multi function). I name the correctly rotated tree L1.
 
-Lastly, I visualize the tree as a Cladogram (or rectangular layout) as the paper does by modifying the lengths of the branches from the tree.
+I visualize the tree as a Cladogram (or rectangular layout) as the paper does by modifying the lengths of the branches from the tree and name it LL1.
 
 ```{r}
 plot(phylocomplete)
@@ -180,23 +183,19 @@ L1<- rotate.multi(L1, 53)
 L1<- rotate.multi(L1, 54)
 L1<- rotate.multi(L1, 55)
 
-#I have named the rotated tree L1 which is now in the same order as the paper
+
 plot(L1)
 
-#now we modify branch legth to 1 (for my convenience I have named the rectangle cladogram LL1)
 LL1<-compute.brlen(L1, length =1)
 
-#LL1 now matched Figure 1 of the paper.
 plot(LL1)
-
-
 ```
 
 Now that the tree is replicated I am moving onto the right part of Figure 1 (for the purposes of this report, I am calling this image replication Part 2).
 
 For Part 2, I need to combine all of the RMR of all of the species provided with the three sets of data (tibia, humerus, and femur.)
 
-In order to make my life easier when combining this data I am changing the names of the Resting Metabolic Rate columns to "RMR". I then check the column names to make sure I have the correct new column name titles.
+In order to make my life easier when combining this data I start by changing the names of the Resting Metabolic Rate columns to "RMR". I then check the column names to make sure I have the correct new column name titles.
 
 ```{r}
 colnames(tibia)[2] <- "RMR"
@@ -220,15 +219,17 @@ allsSpeciesRMR <- cbind(allSpecies, allRMR)
 allSpeciesRMR <- drop_na(allsSpeciesRMR)
 
 allSpeciesRMR1 <- allSpeciesRMR %>% distinct(Species, .keep_all = TRUE)
+```
+Now that I have all of the data together I can generate the plot.
+Here I plot RMR on the x-axis and Species on the Y-axis
+I make sure the shapes are squares (shape 15)
+I makes values less than 1 blue, and values more than 1 red.
 
-#now that I have all of the data togehter I can greate the plot.
-#Here I plot RMR on the x-axis and Species on the Y-axis
-#I make sure the shapes are squares
-#I makes values less than 1 blue, and values more than 1 red.
-#Lastly, I attempt 
+
+```{r}
 
 
-ggplot(allSpeciesRMR1, aes(x = RMR, y = Species)) + 
+firstplot <- (ggplot(allSpeciesRMR1, aes(x = RMR, y = Species)) + 
   geom_point(shape = 15, size = 4, aes(fill = RMR, colour = ifelse(RMR < 1, "blue", "red"))) +
   scale_colour_identity() +
   scale_fill_identity() +
@@ -236,35 +237,17 @@ ggplot(allSpeciesRMR1, aes(x = RMR, y = Species)) +
   guides(colour = FALSE) + 
  theme_bw() + 
   theme(legend.position="bottom", legend.key.size = unit(.5, "cm"),
-  legend.key.width = unit(2,"cm"))
+  legend.key.width = unit(2,"cm")))
+
+plot(firstplot)
 
 ```
 
 
-#ggplot(allSpeciesRMR1, aes(x= RMR, y=Species)) + geom_point(aes(fill = qsec)) + 
- # scale_fill_gradient(colours = c("blue","purple","red"), 
-  #breaks=c(0,1,3), labels = format(c("0","1","3")))
+I then realize that the data above only contains the data provided in the data from dryad.
 
-#GRADIENT
-#ggplot(allSpeciesRMR1, aes(x= RMR, y=Species)) + geom_point(aes(fill = RMR)) + 
-#geom_point(aes(fill = RMR)+ 
- # scale_fill_gradient(low = "red", high = "red", breaks = c(0, 1, 3), labels = c("0", "1", "3")))
-
-###
-       
-#(ggplot(allSpeciesRMR1, aes(x = RMR, y = Species)) + 
- # geom_point(shape=0, colour = "blue")) + %>% mutate(Color = ifelse(C1 > 0, "green", "red")) %>%   
-       
-
-
-       
-#  geom_errorbarh(aes(xmax = resp + se, xmin = resp - se))
-Here I realize that the data above only contains the data provided in the data from dryad.
-
-In order to have all of the data reported on Figure 1, I have manually added all of the Table 1 data from the paper below, and cbind them into a dataframe called missingspecies. I then join this data with the previous data above. into a dataframe called full data.
+In order to have all of the data reported on Figure 1, I have manually added all of the Table 1 data from the paper below(Species, RMR, UL, and LL), and cbind them into a dataframe called missingspecies. I then convert to the same type of data and join this data with the previous data above into a dataframe called full data.
 ```{r}
-#here i add the data that was provided in the paper table but not in the data on dryad but that is shown on Figure 1.
-
 Species <- c("Prolacerta broomi", "Proterosuchus fergusi", "Garjainia madiba", "Euparkeria capensis", "Rutiodon carolinensis", "Calyptosuchus wellesi", "Postosuchus kirkpatricki", "Lesothosaurus diagnosticus", "Maiasaura peeblesorum", "Thecodontosaurus antiquus", "Coelophysis bauri", "Lourinhanosaurus antunesi", "Allosaurus fragilis", "Troodon formosus")
 RMR<- c(1.779574478, 0.742796421, 1.428587942, 1.388275876, 0.395353151, 1.707702381, 1.864455587, 1.130079749, 0.861329988, 1.002164215, 11.83642213, 2.285600254, 5.889620032, 3.301842183)
 LL <- c(1.319254894,0.604057894, 1.093892708, 1.05448569, 0.308843779, 1.135032404, 1.165933134, 0.78543557, 0.532978612, 0.760912118, 7.44819231, 1.624566141, 3.680724942, 2.388193685)
@@ -277,11 +260,8 @@ colnames(allSpeciesRMR1)
 class(allSpeciesRMR1)
 class(missingspecies)
 
-#convert to same type of data
 
 missingspecies <- mutate(missingspecies, RMR = as.double(RMR))  
-
-
 
 fulldata<- (full_join(allSpeciesRMR1, missingspecies, by = c("RMR", "Species")))
 
@@ -290,17 +270,16 @@ fulldata
 
 The data is now ready to be fully plotted.
 
-#Here I plot the full dataset,  using shapes and colors like the paper.
-#I understand that this paper was published before R packages were as advanced as they are now, thus the author created images outside of R. So this image has more similar colors to that of the image created outside of R.
+Here I plot the full dataset,  using shapes and colors like the paper.
+I understand that this paper was published before R packages were as advanced as they are now, thus the author created images outside of R. So this image has more similar colors to that of the image created outside of R.
 
-
-```{r}
-#In order to match the original image better, I change "blue" to "light blue"
+In order to match the original image better, I change "blue" to "light blue"
 #Add a title to the x-axis
 #add a scale gradient to the legend along with the breaks the paper has.
 #remove the grey background
+```{r}
 
-ggplot(fulldata, aes(x = RMR, y = Species)) +
+plot2 <-(ggplot(fulldata, aes(x = RMR, y = Species)) +
   geom_point(shape = 15, size = 4, aes(fill = RMR, colour = ifelse(RMR < 1, "light blue", "red"))) +
   labs( x = "Mass-specific resting metabolic rate") +
 scale_colour_identity() +
@@ -309,11 +288,16 @@ scale_colour_identity() +
   guides(colour = FALSE) + 
  theme_bw() + 
   theme(legend.position="bottom", legend.key.size = unit(.5, "cm"),
-  legend.key.width = unit(2,"cm"))
+  legend.key.width = unit(2,"cm")))
 
-#Here I have created a second image using fill gradients 
-#change the shape to 22 as the squares are outlined in the paper
-#save image as FIGURE1
+plot(plot2)
+```
+
+Here I have created a second image using fill gradients 
+I changed the shape to 22 as the squares are outlined in the paper and save image as FIGURE1
+
+
+```{r}
 
 FIGURE1 <- (ggplot(fulldata, aes(x = RMR, y = Species)) + 
    geom_point(shape = 22, size = 4, color = "black", aes(fill = RMR, colour = ifelse(RMR < 1, "light blue", "red"))) +
@@ -329,14 +313,15 @@ FIGURE1 <- (ggplot(fulldata, aes(x = RMR, y = Species)) +
    legend.key.width = unit(1,"inches")))
 
 plot(FIGURE1)
+```
 
-#fixing color fill
-
+I made sure RMR, UL, amd LL were numeric and added the errorbars to the plot naming it fixingscale.
+```{r}
 fulldata$RMR<-as.numeric(fulldata$RMR)
-
 fulldata$UL<-as.numeric(fulldata$UL)
 fulldata$LL<-as.numeric(fulldata$LL)
-#CORRECT
+
+
 fixingscale <- (ggplot(fulldata , aes(x = RMR, y = Species)) + 
    geom_point(shape = 22, size = 4, color = "black", aes(fill = RMR)) +
    labs( x = "Mass-specific resting metabolic rate") +
@@ -352,6 +337,10 @@ fixingscale <- (ggplot(fulldata , aes(x = RMR, y = Species)) +
 plot(fixingscale)
   
 
+```
+
+
+```{r}
 #Here I filder the full data to remove NA's
 
 
@@ -369,39 +358,47 @@ ggplot(fulldata, aes(x = RMR, y = Species)) +
     theme(legend.position="bottom", legend.key.size = unit(.1, "inches"),
    legend.key.width = unit(1,"inches"))
 
-
-#Now we add the whiskers
-#making sure to take out any NA's and I created a new dataset called "whiskers" for that
-
-
+#making sure to take out any NA's and I created a new dataset called error bars for that
 
 #Species order
 
-#Sorder <- c("Pleurodeles waltl", "Microcebus murinus", "Cavia porcellus", "Mus musculus", "Zootoca vivipara", "Podarcis muralis", "Varanus exanthematicus", "Varanus niloticus", "Chelodina oblonga", "Pelodiscus sinensis","Trachemys scripta", "Prolacerta broomi", "Proterosuchus fergusi", "Garjainia madiba", "Euparkeria capensis", "Rutiodon carolinensis", "Crocodylus niloticus", "Postosuchus kirkpatricki", "Calyptosuchus wellesi", "Lesothosaurus diagnosticus", "Maiasaura peeblesorum", "Thecodontosaurus antiquus", "Coelophysis bauri", "Allosaurus fragilis", "Lourinhanosaurus antunesi", "Troodon formosus", "Anas platyrhynchos", "Gallus gallus")
+#Here I create the species order found on Figure 1 Part 2.
+```
 
+Here I made sure to use the order in which the species appear on the paper. I manually added the order as Sorder2 and ploted the final plot.
+
+```{r}
 
 Sorder2 <- c("Gallus gallus", "Anas platyrhynchos",  "Troodon formosus", "Lourinhanosaurus antunesi","Allosaurus fragilis","Coelophysis bauri","Thecodontosaurus antiquus", "Maiasaura peeblesorum", "Lesothosaurus diagnosticus", "Calyptosuchus wellesi","Postosuchus kirkpatricki", "Crocodylus niloticus", "Rutiodon carolinensis",  "Euparkeria capensis","Garjainia madiba","Proterosuchus fergusi", "Prolacerta broomi", "Trachemys scripta", "Pelodiscus sinensis","Chelodina oblonga","Varanus niloticus","Varanus exanthematicus","Podarcis muralis","Zootoca vivipara", "Mus musculus", "Cavia porcellus", "Microcebus murinus","Pleurodeles waltl")
+
 fulldata$Species <- factor(fulldata$Species, levels=Sorder2)
 
- (ggplot(fulldata , aes(x = RMR, y = Species)) + 
+final <- (ggplot(fulldata , aes(x = RMR, y = Species)) + 
    geom_point(shape = 22, size = 4, color = "black", aes(fill = RMR)) +
    labs( x = "Mass-specific resting metabolic rate") +
      scale_fill_gradient(low = "light blue", high = "red", breaks = c(0, 1, 2, 3, 6, 8, 10, 12), labels = c("0", "1", "2", "3", "6", "8", "10", "12"))+
   theme_classic() + 
     geom_errorbarh(aes(xmax=UL, xmin=LL)) +
-  theme(plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "inches")) +
+   theme(plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "inches")) +
     theme(legend.position="bottom", legend.key.size = unit(.1, "inches"),
    legend.key.width = unit(1,"inches")))
+
+
+plot(final)
+
 ```
 
 ANALYSIS REPLICATION
 
-In order to make my life easier I am changing the names of the Resting Metabolic Rate columns to "RMR". I then check the column names to make sure I have the correct new column name titles.
-
-
 ## Statistical Replications/Reanalysis
 
 [Be sure to **thoroughly** explain what replications you are doing and comment your code so that it is easy for a reader to understand. Include in this section relevant tables/figures/values from the original paper for comparison to what you accomplished with your replication. Note that I want you to do the bulk of any *exposition* using text and markdown syntax outside of code blocks. That is, your document should not just be one big code block with ***R*** style comments but rather a nicely formatted report with code separated from exposition, interpretation, and dicussion.]
+
+###To investigate further into the evolution of high resting metabolic rates in amniotes, we reconstructed ancestral states of RMR from both observed and predicted values, using a phylogeny of our complete sample. 
+
+Ancestral RMR values were estimated for all nodes using the function fastAnc from the R package phytools (Revell 2012); this function compiles maximum likelihood ancestral states with 95% confidence intervals assuming a Brownian motion model, and allows us to plot it on the original phylogeny (Fig. 2).
+
+
 
 ## Summary/Discussion
 
@@ -415,7 +412,7 @@ Create a new RStudio project detailing your work on replicating the results pres
 
 Note that I will be looking for you to clearly take your reader through all of the elements of data manipulation, analysis, and, if appropriate, visualization. You should provide as much coding detail, explanation, and output tables as necessary to compare your results to those published!
 
-You do not need to replicate ALL of the analyses presented in the paper (although the more the better)! At a bare minimum, you need to repeat at least three analyses, including at least one descriptive statistical analysis, one visualization, and one inferential statistical analysis.
+You do not need to replicate ALL of the analyses presented in the paper (although the more the better)!
 
 As assessment, I will be looking at several different elements of your report and code for this assignment. Below, I outline some of the main things:
 
@@ -460,14 +457,105 @@ using a phylogeny of our complete sample.
 Ancestral RMR values were estimated for all nodes using the function 
 
 fastAnc from the R package phytools (Revell 2012); this function compiles maximum likelihood ancestral states with 95% confidence intervals assuming a Brownian motion model, and
-```{r}
-#LucasTree1 <- read.tree("LucasTree")
 
+## Load anole tree
+anole.tree <- read.tree("http://www.phytools.org/eqg2015/data/anole.tre")
+
+## Load anole trait data, extract snout-vent-length (svl) as named vector
+svl <- fulldata %>%
+  mutate(svl = set_names(svl, Species)) %>%
+  pull(svl)
+
+ssvl <- tibia %>%
+  mutate(svl=set_names(svl, Species)) %>%
+  pull(svl)
+
+
+svl
+head(svl)
+# Plot with default color scheme
+contmap_obj <- contMap(phylocomplete, svl, plot = FALSE)
+
+plot(
+  contmap_obj, 
+  type="fan", 
+  legend = 0.7*max(nodeHeights(anole.tree)),
+  fsize = c(0.5, 0.7))
+nole.tree <- read.tree("http://www.phytools.org/eqg2015/data/anole.tre")
+
+head(anole.tree)
+
+obj<-contMap(phylocomplete, svl,plot=FALSE)
+
+head(completetree)
+
+plot(obj,lwd=7,xlim=c(-0.2,3.6))
+errorbar.contMap(obj)
+
+
+
+
+svl <- read.csv(t, row.names=1)
+9
+svl <- as.matrix(phylocomplete$tip.label)[,1] 
+
+fit <- fastAnc(phylocomplete,svl,vars=TRUE,CI=TRUE)
+
+
+
+fit_obj <- contMap(anole_tree, svl, plot=FALSE)
+plot(fit_obj, type="fan", legend=0.7*max(nodeHeights(anole_tree)), fsize=c(0.7,0.9))
+#convert dataframe to a vector
+
+## load data from Garland et al. (1992)
+data(mammal.tree)
+data(mammal.data)
+## extract character of interest
+tipnames<-(setNames(phylocomplete$tip.label,
+    rownames(phylocomplete)))
+
+tipnames
+
+## estimate ancestral body sizes
+Ancestral<-fastAnc(phylocomplete,tipnames,vars = FALSE, CI=TRUE)
+print(fit.BM,printlen=10)
+
+phylocomplete[ is.na(phylocomplete) ] <- 0
+phylocomplete$tip.label<- apply(phylocomplete,1,function(x) as.numeric(paste0(x , collapse="")))
+
+phylocomplete[ is.na(phylocomplete) ] <- 0
+phylocomplete$tip.label <- as.numeric(do.call(paste0, phylocomplete))
+
+head(completetree)
+
+if(any(is.na(phylocomplete$tip.label))){
+  stop("NA values found in phylocomplete$tip.label. Please ensure all tip labels are non- NA.")}
+
+drop.tip(phylocomplete, phylocomplete$tip.label, trim.internal = TRUE)
+
+tib_label<- get_tip_labels(phylocomplete)
+
+tipnames<-TipLabels(phylocomplete, single=TRUE)
+
+tip_labelss <- phylocomplete$tip.label[!is.na(phylocomplete$tip.label)]
+
+ancestral_states <- fastAnc(phylocomplete, tip.label, vars = FALSE, CI = FALSE)
+
+head(phylocomplete)
+
+
+     ancestral_states <- fastAnc(completetree, completetree$tip.label,names(RMR), vars = FALSE, CI = FALSE)
+ancestral_states <- fastAnc(phylocomplete, phylocomplete$tip.label, vars = FALSE, CI = FALSE)
+
+class(phylocomplete$tip.label)
+
+setdiff(phylocomplete$tip.label)
+setdiff(completetree$tip.label,names(RMR))
 #fastAnc(phylocomplete,phylocomplete$edge.length, vars=FALSE, CI=FALSE)
 
 #edge_lengths <- setNames(phylocomplete$edge.length, phylocomplete$tip.label)
 
-#ancestral_states <- fastAnc(phylocomplete, edge_lengths, vars = FALSE, CI = FALSE)
+ancestral_states <- fastAnc(phylocomplete, RMR, vars = FALSE, CI = FALSE)
 
 #edge_lengths <- edge_lengths[match(phylocomplete$tip.label, names(edge_lengths))]
 
@@ -486,34 +574,13 @@ fastAnc from the R package phytools (Revell 2012); this function compiles maximu
 #fit.BM<-fastAnc(Maintree,ln.bodyMass,CI=TRUE)
 #print(fit.BM,printlen=10)
 
-
-
 #fastAnc(phylocomplete, x_ordered, vars = FALSE, CI = FALSE)
 
 #str(phylocomplete)
 #x_ordered <- phylocomplete$tip.label[match(phylocomplete, phylocomplete$tip.label)]
 
-#head(phylocomplete$tip.label)
 
-#any(is.na(phylocomplete$tip.label))
-
-#is.numeric(phlyocomplete$tip.label)
-#Nnode_ordered <- Nnode[match(complete$tip.label, names(Nnode))]
 #ancestralstates <- fastAnc(complete, complete$tip.label)
-
-#any(is.na(complete$tip.label))
-#is.nan(complete$tip.label)
- 
-# is.infinite(complete$tip.label) 
-#  any(is.na(complete$edge.length)
-      
-#is.nan(complete$edge.length)
- #is.infinite(complete$edge.length)
- 
-# complete$tip.label <- as.character(complete$tip.label)
- 
-
-```
 
 #Extra
 This section contains extra replications I have done for this project.
