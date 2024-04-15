@@ -295,7 +295,6 @@ The data is now ready to be fully plotted.
 
 
 ```{r}
-
 #In order to match the original image better, I change "blue" to "light blue"
 #Add a title to the x-axis
 #add a scale gradient to the legend along with the breaks the paper has.
@@ -317,44 +316,82 @@ scale_colour_identity() +
 #save image as FIGURE1
 
 FIGURE1 <- (ggplot(fulldata, aes(x = RMR, y = Species)) + 
-  geom_point(shape = 22, size = 4, color = "black", aes(fill = RMR, colour = ifelse(RMR < 1, "light blue", "red"))) +
-  labs( x = "Mass-specific resting metabolic rate") +
+   geom_point(shape = 22, size = 4, color = "black", aes(fill = RMR, colour = ifelse(RMR < 1, "light blue", "red"))) +
+   labs( x = "Mass-specific resting metabolic rate") +
   scale_colour_identity() +
-  scale_fill_identity() +
-    scale_fill_gradient(low = "light blue", high = "red", breaks = c(0, 1, 2, 3, 6, 8, 10, 12), labels = c("0", "1", "2", "3", "6", "8", "10", "12"))+
-  guides(colour = FALSE) + 
- theme_classic() + 
- theme(plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), 
+    scale_fill_identity() +
+     scale_fill_gradient(low = "light blue", high = "red", breaks = c(0, 1, 2, 3, 6, 8, 10, 12), labels = c("0", "1", "2", "3", "6", "8", "10", "12"))+
+   guides(colour = FALSE) + 
+  theme_classic() + 
+  theme(plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), 
                                 "inches")) +
     theme(legend.position="bottom", legend.key.size = unit(.1, "inches"),
-  legend.key.width = unit(1,"inches")))
+   legend.key.width = unit(1,"inches")))
 
 plot(FIGURE1)
 
+#fixing color fill
+
+fulldata$RMR<-as.numeric(fulldata$RMR)
+
+fulldata$UL<-as.numeric(fulldata$UL)
+fulldata$LL<-as.numeric(fulldata$LL)
+#CORRECT
+fixingscale <- (ggplot(fulldata , aes(x = RMR, y = Species)) + 
+   geom_point(shape = 22, size = 4, color = "black", aes(fill = RMR)) +
+   labs( x = "Mass-specific resting metabolic rate") +
+     scale_fill_gradient(low = "light blue", high = "red", breaks = c(0, 1, 2, 3, 6, 8, 10, 12), labels = c("0", "1", "2", "3", "6", "8", "10", "12"))+
+  theme_classic() + 
+    geom_errorbarh(aes(xmax=UL, xmin=LL)) +
+  theme(plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "inches")) +
+    theme(legend.position="bottom", legend.key.size = unit(.1, "inches"),
+   legend.key.width = unit(1,"inches")))
+
+
+
+plot(fixingscale)
+  
+
+#Here I filder the full data to remove NA's
+
+
+
+ggplot(fulldata, aes(x = RMR, y = Species)) + 
+   geom_point(shape = 22, size = 4, color = "black", aes(fill = RMR, colour = ifelse(RMR < 1, "light blue", "red"))) +
+   labs( x = "Mass-specific resting metabolic rate") +
+  scale_colour_identity() +
+    scale_fill_identity() +
+     scale_fill_gradient(low = "light blue", high = "red", breaks = c(0, 1, 2, 3, 6, 8, 10, 12), labels = c("0", "1", "2", "3", "6", "8", "10", "12"))+
+   guides(colour = FALSE) + 
+  theme_classic() + 
+  theme(plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), 
+                                "inches")) +
+    theme(legend.position="bottom", legend.key.size = unit(.1, "inches"),
+   legend.key.width = unit(1,"inches"))
+
 
 #Now we add the whiskers
-
-#FIGURE1 +
-  #geom_point() +
-# geom_errorbarh(aes(xmax=UL, xmin=LL))
-
-  
-  
-  
-#scale_fill_gradientn(colours=topo.colors(7),na.value = "transparent",
-                         #  breaks=c(0,0.5,1),labels=c("Minimum",0.5,"Maximum"),
-                          # limits=c(0,1))
+#making sure to take out any NA's and I created a new dataset called "whiskers" for that
 
 
 
+#Species order
+
+#Sorder <- c("Pleurodeles waltl", "Microcebus murinus", "Cavia porcellus", "Mus musculus", "Zootoca vivipara", "Podarcis muralis", "Varanus exanthematicus", "Varanus niloticus", "Chelodina oblonga", "Pelodiscus sinensis","Trachemys scripta", "Prolacerta broomi", "Proterosuchus fergusi", "Garjainia madiba", "Euparkeria capensis", "Rutiodon carolinensis", "Crocodylus niloticus", "Postosuchus kirkpatricki", "Calyptosuchus wellesi", "Lesothosaurus diagnosticus", "Maiasaura peeblesorum", "Thecodontosaurus antiquus", "Coelophysis bauri", "Allosaurus fragilis", "Lourinhanosaurus antunesi", "Troodon formosus", "Anas platyrhynchos", "Gallus gallus")
 
 
+Sorder2 <- c("Gallus gallus", "Anas platyrhynchos",  "Troodon formosus", "Lourinhanosaurus antunesi","Allosaurus fragilis","Coelophysis bauri","Thecodontosaurus antiquus", "Maiasaura peeblesorum", "Lesothosaurus diagnosticus", "Calyptosuchus wellesi","Postosuchus kirkpatricki", "Crocodylus niloticus", "Rutiodon carolinensis",  "Euparkeria capensis","Garjainia madiba","Proterosuchus fergusi", "Prolacerta broomi", "Trachemys scripta", "Pelodiscus sinensis","Chelodina oblonga","Varanus niloticus","Varanus exanthematicus","Podarcis muralis","Zootoca vivipara", "Mus musculus", "Cavia porcellus", "Microcebus murinus","Pleurodeles waltl")
+fulldata$Species <- factor(fulldata$Species, levels=Sorder2)
 
-
-
-
-#scale_fill_gradientn(colours=topo.colors(7),na.value = "transparent")
-
+ (ggplot(fulldata , aes(x = RMR, y = Species)) + 
+   geom_point(shape = 22, size = 4, color = "black", aes(fill = RMR)) +
+   labs( x = "Mass-specific resting metabolic rate") +
+     scale_fill_gradient(low = "light blue", high = "red", breaks = c(0, 1, 2, 3, 6, 8, 10, 12), labels = c("0", "1", "2", "3", "6", "8", "10", "12"))+
+  theme_classic() + 
+    geom_errorbarh(aes(xmax=UL, xmin=LL)) +
+  theme(plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "inches")) +
+    theme(legend.position="bottom", legend.key.size = unit(.1, "inches"),
+   legend.key.width = unit(1,"inches")))
 ```
 
 ANALYSIS REPLICATION
