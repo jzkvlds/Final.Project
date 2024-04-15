@@ -484,14 +484,14 @@ library(tidyverse)</code></pre>
 ## trees with their covariates and other associated data. Methods in
 ## Ecology and Evolution. 2017, 8(1):28-36. doi:10.1111/2041-210X.12628
 ## 
-## Guangchuang Yu, Tommy Tsan-Yuk Lam, Huachen Zhu, Yi Guan. Two methods
-## for mapping and visualizing associated data on phylogeny using ggtree.
-## Molecular Biology and Evolution. 2018, 35(12):3041-3043.
-## doi:10.1093/molbev/msy194
+## Guangchuang Yu. Using ggtree to visualize data on tree-like structures.
+## Current Protocols in Bioinformatics. 2020, 69:e96. doi:10.1002/cpbi.96
 ## 
-## Guangchuang Yu.  Data Integration, Manipulation and Visualization of
-## Phylogenetic Trees (1st edition). Chapman and Hall/CRC. 2022,
-## doi:10.1201/9781003279242
+## LG Wang, TTY Lam, S Xu, Z Dai, L Zhou, T Feng, P Guo, CW Dunn, BR
+## Jones, T Bradley, H Zhu, Y Guan, Y Jiang, G Yu. treeio: an R package
+## for phylogenetic tree input and output with richly annotated and
+## associated data. Molecular Biology and Evolution. 2020, 37(2):599-603.
+## doi: 10.1093/molbev/msz240
 ## 
 ## Attaching package: &#39;ggtree&#39;
 ## 
@@ -544,9 +544,10 @@ library(Metrics)</code></pre>
 femurfilemeta.txt, humerusfilemeta.txt, tibiafilemeta.txt,
 Treecomplete.trees.nex, TreefemurMeta.nex,TreehumerusMeta.nex,
 TreetibiaMeta.nex.</p>
-<p>The files were loaded into R using the the “Files” tab and finding
-the files through my directory as indicated below. I titled each data by
-the bone it refers to and viewed the head of the data.</p>
+<p>I downloaded the filed from Dryad and saved them into a folder called
+DATA in my repo.The files then loaded into R through my directory as
+indicated below. I titled each data by the bone it refers to and viewed
+the head of the data.</p>
 <pre class="r"><code>f&lt;- &quot;/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/tibiafilemeta.txt&quot;
 
 tibia &lt;- read.delim(f, stringsAsFactors = FALSE, fileEncoding = &quot;latin1&quot;)
@@ -630,7 +631,7 @@ them by the component (tibia, humerus, femus, or complete) and adding
 “tree” in the name.</p>
 <p>Additional trees I have replicated that are not found in any figures
 on the paper can be found below in the “Extra” section.</p>
-<pre class="r"><code>tibiatree &lt;- read.nexus(file = &quot;/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreetibiaMeta.nex&quot;)
+<pre class="r"><code>tibiatree &lt;- read.nexus(file = &quot;/Users/jessicavaldes/Desktop/R2024/Final.Project2024/DATA/TreetibiaMeta.nex&quot;)
 
 head(tibiatree)</code></pre>
 <pre><code>## $edge
@@ -696,7 +697,7 @@ head(tibiatree)</code></pre>
 ## [13] &quot;Gallus&quot;           &quot;Pleurodeles&quot;      &quot;Allosaurus&quot;       &quot;Coelophysis&quot;     
 ## [17] &quot;Lesothosaurus&quot;    &quot;Lourinhanosaurus&quot; &quot;Maiasaura&quot;        &quot;Thecodontosaurus&quot;
 ## [21] &quot;Garjainia&quot;        &quot;Prolacerta&quot;       &quot;Proterosuchus&quot;</code></pre>
-<pre class="r"><code>humerustree &lt;- read.nexus(file = &quot;/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreehumerusMeta.nex&quot;)
+<pre class="r"><code>humerustree &lt;- read.nexus(file = &quot;/Users/jessicavaldes/Desktop/R2024/Final.Project2024/DATA/TreehumerusMeta.nex&quot;)
 
 head(humerustree)</code></pre>
 <pre><code>## $edge
@@ -749,7 +750,7 @@ head(humerustree)</code></pre>
 ##  [6] &quot;Pelodiscus&quot;  &quot;Zootoca&quot;     &quot;Podarcis&quot;    &quot;Trachemys&quot;   &quot;Varanusexa&quot; 
 ## [11] &quot;Varanusnil&quot;  &quot;Microcebus&quot;  &quot;Gallus&quot;      &quot;Pleurodeles&quot; &quot;Euparkeria&quot; 
 ## [16] &quot;Postosuchus&quot; &quot;Garjainia&quot;   &quot;Prolacerta&quot;</code></pre>
-<pre class="r"><code>femurtree &lt;- read.nexus(file = &quot;/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreefemurMeta.nex&quot;)
+<pre class="r"><code>femurtree &lt;- read.nexus(file = &quot;/Users/jessicavaldes/Desktop/R2024/Final.Project2024/DATA/TreefemurMeta.nex&quot;)
 
 head(femurtree)</code></pre>
 <pre><code>## $edge
@@ -811,7 +812,7 @@ head(femurtree)</code></pre>
 ## [13] &quot;Gallus&quot;        &quot;Pleurodeles&quot;   &quot;Calyptosuchus&quot; &quot;Lesothosaurus&quot;
 ## [17] &quot;Troodon&quot;       &quot;Allosaurus&quot;    &quot;Rutiodon&quot;      &quot;Maiasaura&quot;    
 ## [21] &quot;Proterosuchus&quot;</code></pre>
-<pre class="r"><code>completetree &lt;- read.nexus(file =   &quot;/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/Treecomplete.trees.nex&quot;)
+<pre class="r"><code>completetree &lt;- read.nexus(file =   &quot;/Users/jessicavaldes/Desktop/R2024/Final.Project2024/DATA/Treecomplete.trees.nex&quot;)
 
 head(completetree)</code></pre>
 <pre><code>## $edge
@@ -898,7 +899,7 @@ paper. I made sure the NEXUS file was loaded.</p>
 <p>I plotted the phylo tree using ggtree, add tip labels (shows the
 species name in this case) and apply a tree-like theme, and name it Main
 Tree</p>
-<pre class="r"><code>completetree &lt;- read.nexus(file = &quot;/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/Treecomplete.trees.nex&quot;)
+<pre class="r"><code>completetree &lt;- read.nexus(file = &quot;/Users/jessicavaldes/Desktop/R2024/Final.Project2024/DATA/Treecomplete.trees.nex&quot;)
 
 phylocomplete &lt;- as.phylo(completetree)
 

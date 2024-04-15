@@ -75,7 +75,7 @@ Legendre et al., 2016 has made their data available at "https://datadryad.org/st
 The following data files were downloaded from Dryad to my computer: femurfilemeta.txt, humerusfilemeta.txt, tibiafilemeta.txt, Treecomplete.trees.nex, TreefemurMeta.nex,TreehumerusMeta.nex, TreetibiaMeta.nex.
 
 
-The files were loaded into R using the the "Files" tab and finding the files through my directory as indicated below. I titled each data by the bone it refers to and viewed the head of the data.
+I downloaded the filed from Dryad and saved them into a folder called DATA in my repo.The files then loaded into R through my directory as indicated below. I titled each data by the bone it refers to and viewed the head of the data.
 
 
 
@@ -105,19 +105,19 @@ Here I have loaded the tree data  by reading the NEXUS file and naming them by t
 Additional trees I have replicated that are not found in any figures on the paper can be found below in the "Extra" section.
 
 ```{r}
-tibiatree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreetibiaMeta.nex")
+tibiatree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/Final.Project2024/DATA/TreetibiaMeta.nex")
 
 head(tibiatree)
 
-humerustree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreehumerusMeta.nex")
+humerustree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/Final.Project2024/DATA/TreehumerusMeta.nex")
 
 head(humerustree)
 
-femurtree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreefemurMeta.nex")
+femurtree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/Final.Project2024/DATA/TreefemurMeta.nex")
 
 head(femurtree)
 
-completetree <- read.nexus(file =   "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/Treecomplete.trees.nex")
+completetree <- read.nexus(file =   "/Users/jessicavaldes/Desktop/R2024/Final.Project2024/DATA/Treecomplete.trees.nex")
 
 head(completetree)
 
@@ -134,7 +134,7 @@ I plotted the phylo tree using ggtree, add tip labels (shows the species name in
 
 ```{r}
 
-completetree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/Treecomplete.trees.nex")
+completetree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/Final.Project2024/DATA/Treecomplete.trees.nex")
 
 phylocomplete <- as.phylo(completetree)
 
