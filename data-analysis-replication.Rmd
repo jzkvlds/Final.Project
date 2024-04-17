@@ -44,11 +44,7 @@ Visualization:
 
 Here I replicated the sepratate components of Figure 1. Separate images have been coded below as the original work was tied together using a program other than R. 
 
-statistical analysis,  one inferential statistical analysis:
-
 The data analysis I replicated the was done in order to reconstruct the ancestral states of RMR from both observed and predicted values by using a phylogeny of the complete sample. 
-
-#Ancestral RMR values were estimated for all nodes using the function fastAnc from the R package phytools
 
 
 These are the packages that I used for this replication:
@@ -66,6 +62,14 @@ library(gridExtra)
 library(MPSEM)
 library(evobiR)
 library(Metrics)
+
+
+library(AICcmodavg)
+library(caper)
+library(dplyr)
+library(nlme)
+library(nortest)
+library(RColorBrewer)
 ```
 
 #  *Visualization of Data*
@@ -75,7 +79,7 @@ Legendre et al., 2016 has made their data available at "https://datadryad.org/st
 The following data files were downloaded from Dryad to my computer: femurfilemeta.txt, humerusfilemeta.txt, tibiafilemeta.txt, Treecomplete.trees.nex, TreefemurMeta.nex,TreehumerusMeta.nex, TreetibiaMeta.nex.
 
 
-I downloaded the filed from Dryad and saved them into a folder called DATA in my repo.The files then loaded into R through my directory as indicated below. I titled each data by the bone it refers to and viewed the head of the data.
+I downloaded the filed from Dryad and saved them into a local directory (folder) called "DATA" in my repo.The files then loaded into R through my directory as indicated below. I titled each data by the bone it refers to and viewed the head of the data.
 
 
 
@@ -254,7 +258,16 @@ plot(firstplot)
 
 I then realize that the data above only contains the data provided in the data from dryad.
 
-In order to have all of the data reported on Figure 1, I have manually added all of the Table 1 data from the paper below(Species, RMR, UL, and LL), and cbind them into a dataframe called missingspecies. I then convert to the same type of data and join this data with the previous data above into a dataframe called full data.
+In order to have all of the data reported on Figure 1, I have manually added all of the Table 1.
+
+Table 1 shown here:
+
+```{r}
+knitr::include_graphics("IMAGES/TABLE1.png")    
+```   
+
+
+Here I manually add the data from Table 1 (Species, RMR, UL, and LL), and cbind them into a dataframe called missingspecies. I then convert to the same type of data and join this data with the previous data above into a dataframe called full data.
 ```{r}
 Species <- c("Prolacerta broomi", "Proterosuchus fergusi", "Garjainia madiba", "Euparkeria capensis", "Rutiodon carolinensis", "Calyptosuchus wellesi", "Postosuchus kirkpatricki", "Lesothosaurus diagnosticus", "Maiasaura peeblesorum", "Thecodontosaurus antiquus", "Coelophysis bauri", "Lourinhanosaurus antunesi", "Allosaurus fragilis", "Troodon formosus")
 RMR<- c(1.779574478, 0.742796421, 1.428587942, 1.388275876, 0.395353151, 1.707702381, 1.864455587, 1.130079749, 0.861329988, 1.002164215, 11.83642213, 2.285600254, 5.889620032, 3.301842183)
@@ -400,176 +413,102 @@ This plot how looks like the Right side of Figure 1. Here I insert an image of F
 ```{r}
 knitr::include_graphics("IMAGES/Legendre2016Figure1.png")
 ```
+Analysis Replication: 
 
-ANALYSIS REPLICATION
+After an excessive amount of attempts I could not replicate the PEM portion of the paper. Over two weeks later I figured that if my goal is to be able to replicate this type of analysis, I could work with a different dataset form the same author. 
+
+I resorted to trying this analysis on Legendre et al., 2020 and finally succeeded! Leading to my conclusion that there is an error within the dataset of Legendre et al., 2016, thus leading to the errors I encountered countless times.
+
+
+# Analysis
+Phylogenetic Eigenvector Map (PEM) is a method used to analyze patterns of evolution in phylogenetic trees. It is based on the idea that traits of closely related species are more similar that those of distantly related species. PEM's can be useful for comparisons with different variables, with correlations between traits, with clustering of species, and of course with providing insight to patterns of trait evolution.
+
+
+Predictive Modeling: Phylogenetic Eigenvector Maps (PEM)
+
+Here I load in the dataset and tree data and name them as "TreeP" & "DataP" (I chose P since I am working for the PEM.
+
+```{r}
+treeP<- "/Users/jessicavaldes/Desktop/R2024/Final.Project2024/DATA/Lepidosaurtree.trees.nex"
+dataP <- "/Users/jessicavaldes/Desktop/R2024/Final.Project2024/DATA/Dataset1-lepidosaurs.txt"
+
+
+treeP<-read.nexus(treeP)
+head(treeP)
+
+dataP<-read.table(dataP,header=TRUE,stringsAsFactor=FALSE,)
+head(dataP)
+```
+
+
+Here I subset the data and log transform it.
+```{r}
+
+datasubset<-subset(dataP, !is.na(V))
+datasubset[,c(3:5,7:9)]<-log(datasubset[,c(3:5,7:9)])
+```
+
+#### For SVL
+
+Here I match the phylogeny and dataset for the SVL, making sure I drop any NA's and making sure I am subsetting for species.
+```{r}
+treeP<-drop.tip(treeP, setdiff(treeP$tip.label, datasubset$Species))
+
+
+treedrop <- drop.tip(treeP,datasubset[is.na(datasubset[,"SVL"]),"Species"])
+grloc <- getGraphLocations(treeP,datasubset[is.na(datasubset[,"SVL"]),"Species"])
+sporder <- match(attr(grloc$x,"vlabel")[grloc$x$vertex$species],datasubset[,"Species"])
+```
+
+Here I build the PEM
+```{r}
+PEMfs <- list()
+PEMfs[["V"]] <- PEM.fitSimple(y=datasubset[sporder,"SVL"],
+                    x=datasubset[sporder,"V"],w=grloc$x,d="distance",sp="species",
+                    lower=0,upper=1)
+PEMfs[["none"]] <- PEM.fitSimple(y=datasubset[sporder,"SVL"],
+                    x=NULL,w=grloc$x,d="distance",sp="species",lower=0,upper=1)
+for(m in c("V","none")) print(PEMfs[[m]]$optim$par)
+
+head(PEMfs[["none"]])
+
+rm(m)
+
+
+```
+
+Finally it is time to select the best model (a co-predictor vs without co-predictors) co-predictor has been labled as V. All of this based on AICc (Akaike information criterion).
+```{r}
+PEMAIC <- list()
+PEMAIC[["V"]] <- lmforwardsequentialAICc(y=datasubset[sporder,"SVL"],
+                                         x=datasubset[sporder,"V",drop=FALSE],object=PEMfs[["V"]])
+PEMAIC[["none"]] <- lmforwardsequentialAICc(y=datasubset[sporder,"SVL"],object=PEMfs[["none"]])
+for(m in c("V","none"))
+  cat(m,summary(PEMAIC[[m]])$adj,PEMAIC[[m]]$AICc,"\n")
+
+rm(m)
+
+summary(PEMAIC[["V"]]) 
+```
 
 #  *Discussion and Reflection*
 
 I believe I did a pretty good job replicating Figure 1, especially when taking into consideration that the author of the author added color, error bars, and the images by hand.
 
 
-Report discusses and addresses any challenges encountered… missing data, unclear information about how data were processed in the original publication, etc.
 
-A dataset that could have made my life easier, was if the author had loaded a dataset with the complete set of species and RMRs, instead of me having to manually import them. The analysis replications were incredibly difficult as the paper does not mention how any of the calculations were done besides listing what R packages were used for the calculations.
+The biggest challenge was encountered when trying to create the PEM for Legendre et al 2016. It was such a challenge that I could not figure out what was wrong, even when trying to calculate the analysis the same way I calculated the PEM for Legendre 2020.
 
-Report discusses where and possible reasons why the analysis replications might differ from the authors’ original results
+A dataset that could have also made my life easier, was if the author had loaded a dataset with the complete set of species and RMRs, instead of me having to manually import them. The analysis replications were incredibly difficult as the paper does not mention how any of the calculations were done besides listing what R packages were used for the calculations.
 
-
-
-
-## Statistical Replications/Reanalysis
-
-[Be sure to **thoroughly** explain what replications you are doing and comment your code so that it is easy for a reader to understand. Include in this section relevant tables/figures/values from the original paper for comparison to what you accomplished with your replication. Note that I want you to do the bulk of any *exposition* using text and markdown syntax outside of code blocks. That is, your document should not just be one big code block with ***R*** style comments but rather a nicely formatted report with code separated from exposition, interpretation, and dicussion.]
-
-###To investigate further into the evolution of high resting metabolic rates in amniotes, we reconstructed ancestral states of RMR from both observed and predicted values, using a phylogeny of our complete sample. 
-
-Ancestral RMR values were estimated for all nodes using the function fastAnc from the R package phytools (Revell 2012); this function compiles maximum likelihood ancestral states with 95% confidence intervals assuming a Brownian motion model, and allows us to plot it on the original phylogeny (Fig. 2).
-
-
+I could not obtain the correct PEM as the author, an it might have to do with the fact that that paper was written in 2016 and R package availability was quite different from then compared to now.
 
 ## Summary/Discussion
-
-[Narrative section that overviews how successful were you at replicating the analyses and visualizations in the study. What problems did you encounter? Why might you have encountered those problems? What details were lacking from the original study's methods that might have hampered your ability to replicate the authors' results?]
-
-#  References
-Citing the dataset:
-Legendre, Lucas J.; Guénard, Guillaume; Botha-Brink, Jennifer; Cubo, Jorge (2016). Data from: Palaeohistological evidence for ancestral high metabolic rate in archosaurs [Dataset]. Dryad. https://doi.org/10.5061/dryad.2853k
-
-Citing the paper:
-Lucas J. Legendre, Guillaume Guénard, Jennifer Botha-Brink, Jorge Cubo, Palaeohistological Evidence for Ancestral High Metabolic Rate in Archosaurs, Systematic Biology, Volume 65, Issue 6, November 2016, Pages 989–996, https://doi.org/10.1093/sysbio/syw033
-
-
-
-fastAnc from the R package phytools (Revell 2012); this function compiles maximum likelihood ancestral states with 95% confidence intervals assuming a Brownian motion model, and
-
-## Load anole tree
-anole.tree <- read.tree("http://www.phytools.org/eqg2015/data/anole.tre")
-
-## Load anole trait data, extract snout-vent-length (svl) as named vector
-svl <- fulldata %>%
-  mutate(svl = set_names(svl, Species)) %>%
-  pull(svl)
-
-ssvl <- tibia %>%
-  mutate(svl=set_names(svl, Species)) %>%
-  pull(svl)
-
-
-svl
-head(svl)
-# Plot with default color scheme
-contmap_obj <- contMap(phylocomplete, svl, plot = FALSE)
-
-plot(
-  contmap_obj, 
-  type="fan", 
-  legend = 0.7*max(nodeHeights(anole.tree)),
-  fsize = c(0.5, 0.7))
-nole.tree <- read.tree("http://www.phytools.org/eqg2015/data/anole.tre")
-
-head(anole.tree)
-
-obj<-contMap(phylocomplete, svl,plot=FALSE)
-
-head(completetree)
-
-plot(obj,lwd=7,xlim=c(-0.2,3.6))
-errorbar.contMap(obj)
-
-
-
-
-svl <- read.csv(t, row.names=1)
-9
-svl <- as.matrix(phylocomplete$tip.label)[,1] 
-
-fit <- fastAnc(phylocomplete,svl,vars=TRUE,CI=TRUE)
-
-
-
-fit_obj <- contMap(anole_tree, svl, plot=FALSE)
-plot(fit_obj, type="fan", legend=0.7*max(nodeHeights(anole_tree)), fsize=c(0.7,0.9))
-#convert dataframe to a vector
-
-## load data from Garland et al. (1992)
-data(mammal.tree)
-data(mammal.data)
-## extract character of interest
-tipnames<-(setNames(phylocomplete$tip.label,
-    rownames(phylocomplete)))
-
-tipnames
-
-## estimate ancestral body sizes
-Ancestral<-fastAnc(phylocomplete,tipnames,vars = FALSE, CI=TRUE)
-print(fit.BM,printlen=10)
-
-phylocomplete[ is.na(phylocomplete) ] <- 0
-phylocomplete$tip.label<- apply(phylocomplete,1,function(x) as.numeric(paste0(x , collapse="")))
-
-phylocomplete[ is.na(phylocomplete) ] <- 0
-phylocomplete$tip.label <- as.numeric(do.call(paste0, phylocomplete))
-
-head(completetree)
-
-if(any(is.na(phylocomplete$tip.label))){
-  stop("NA values found in phylocomplete$tip.label. Please ensure all tip labels are non- NA.")}
-
-drop.tip(phylocomplete, phylocomplete$tip.label, trim.internal = TRUE)
-
-tib_label<- get_tip_labels(phylocomplete)
-
-tipnames<-TipLabels(phylocomplete, single=TRUE)
-
-tip_labelss <- phylocomplete$tip.label[!is.na(phylocomplete$tip.label)]
-
-ancestral_states <- fastAnc(phylocomplete, tip.label, vars = FALSE, CI = FALSE)
-
-head(phylocomplete)
-
-
-     ancestral_states <- fastAnc(completetree, completetree$tip.label,names(RMR), vars = FALSE, CI = FALSE)
-ancestral_states <- fastAnc(phylocomplete, phylocomplete$tip.label, vars = FALSE, CI = FALSE)
-
-class(phylocomplete$tip.label)
-
-setdiff(phylocomplete$tip.label)
-setdiff(completetree$tip.label,names(RMR))
-#fastAnc(phylocomplete,phylocomplete$edge.length, vars=FALSE, CI=FALSE)
-
-#edge_lengths <- setNames(phylocomplete$edge.length, phylocomplete$tip.label)
-
-ancestral_states <- fastAnc(phylocomplete, RMR, vars = FALSE, CI = FALSE)
-
-#edge_lengths <- edge_lengths[match(phylocomplete$tip.label, names(edge_lengths))]
-
-#ancestral_states <- fastAnc(phylocomplete, edge_lengths, vars = FALSE, CI = FALSE)
-
-#head(ancestral_states)
-
-#colnames(ancestral_states)
-## extract character of interest
-#fastAn <-log(setNames(phylocomplete$edge.legth,
- #   rownames(phylocomplete)))
-
-
-#class(phylocomplete$edge.length)
-## estimate ancestral body sizes
-#fit.BM<-fastAnc(Maintree,ln.bodyMass,CI=TRUE)
-#print(fit.BM,printlen=10)
-
-#fastAnc(phylocomplete, x_ordered, vars = FALSE, CI = FALSE)
-
-#str(phylocomplete)
-#x_ordered <- phylocomplete$tip.label[match(phylocomplete, phylocomplete$tip.label)]
-
-
-#ancestralstates <- fastAnc(complete, complete$tip.label)
 
 #   Extra
 This section contains extra replications I have done for this project although they did not show up as figures on the paper.
 
-I once again read the NEXUS file, converted to phylo object, plotten tree using ggtree by adding tip labels and applyinga tree like theme.,
+I once again read the NEXUS file, converted to phylo object, plotten tree using ggtree by adding tip labels and applyina tree like theme.,
 
 ```{r}
 t <- "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreefemurMeta.nex"
@@ -657,194 +596,16 @@ plot(tibiatreeplot)
 ```
 
 
-PEM
+#  References
+Citing the dataset:
+Legendre, Lucas J.; Guénard, Guillaume; Botha-Brink, Jennifer; Cubo, Jorge (2016). Data from: Palaeohistological evidence for ancestral high metabolic rate in archosaurs [Dataset]. Dryad. https://doi.org/10.5061/dryad.2853k
 
-#```{r}
+Citing the paper:
+Lucas J. Legendre, Guillaume Guénard, Jennifer Botha-Brink, Jorge Cubo, Palaeohistological Evidence for Ancestral High Metabolic Rate in Archosaurs, Systematic Biology, Volume 65, Issue 6, November 2016, Pages 989–996, https://doi.org/10.1093/sysbio/syw033
 
-#in order to extract PEM first I
+Citing second paper:
+Legendre, L.J., Rubilar-Rogers, D., Musser, G.M. et al. A giant soft-shelled egg from the Late Cretaceous of Antarctica. Nature 583, 411–414 (2020). https://doi.org/10.1038/s41586-020-2377-7
 
-# Extract eigenvectors from the tree
-grloc <- getGraphLocations(LucasTree,phylocomplete[is.na(data[,"RMR"]),"species"])
-
-head(grloc)
-
-sporder <- match(attr(grloc$x,"vlabel")[grloc$x$vertex$species],phylocomplete[,"species"])
-
-#then I build the PME, here is a list of variables
-
-aux <- c("Vasc_density","Cell_density","Cell_size","Cell_shape")
-
-1+1
-
-PEMfs <- list()
-  for(m in aux) {
-    PEMfs[[m]] <- PEM.fitSimple(y=data[sporder,"RMR"],
-                                        x=data[sporder,m],w=grloc$x,d="distance",sp="species",lower=0,upper=1)
-  PEMfs[["none"]] <- PEM.fitSimple(y=data[sporder,"RMR"],
-                                           x=NULL,w=grloc$x,d="distance",sp="species",lower=0,upper=1)
-} ; rm(m)
-
-```
-RESTART
-#```{r}
-f<- "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/femurfilemeta.txt"
-
-femur <- read.delim(f, stringsAsFactors = FALSE, fileEncoding = "latin1")
-
-head(femur)c
-
-#Here I read the femus data as a table
-#f<- "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/femurfilemeta.txt"
-
-#femurdata<-read.table(f, header=T)
-
-#head(femur)
-
-t <- "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreefemurMeta.nex"
-
-#tabledata <- read.table(t, header = T)
-# Here I read the NEXUS file
-Ftree <- read.nexus(t)
-plot(Ftree)
-
-phyloftree <- as.phylo(Ftree)
-
-class(phyloftree)
-
-plot(phyloftree, use.edge.length=FALSE)
-nodelabels()
-
-finaltree <- ReorderData(Ftree, femur, taxa.names = "Species")
-
-plot(finaltree)
- 
-femurtree2 <- read.tree(f)
-
-newfemurtree<- ggtree(Ftree, branch.length='none', layout="rectangular") + geom_tiplab() 
-
-plot(newfemurtree)
-
-rotateNodes(newfemurtree, 29)
-
-
-
-# Match the order of species in the dataset with that in the tree
-reorderedtree <- ReorderData(Ftree, femur, taxa.names = "Species")
-
-
-
-
-
-
-plot(reorderedtree)
-
-phyloreordered <- as.phylo(reorderedtree)
-
-plotTree(reordered)
-
-
-newfemur <- femur[1]<-femur[1]; femur[,c(2,4:6)]<-log(femur[,c(2,4:6)]); femur[,3]<-log1p(femur[,3])
-
- ###
-# Here I convert the femurtree to a phylo object
-phylofemurtree <- as.phylo(femurtree)
-
-#BiocManager::install("ggtree")
-
-# Plot the phylo tree using ggtree, add tip labels and pply a tree-like theme
-ggtree(phylofemurtree) +
-  geom_tiplab() +  
-  theme_tree()   
-```
-
-
-#```{r}
-
-### PEM ###
-
-# Extract eigenvectors from the tree
-
-#Here I make the collumnb title easier into RMR
-colnames(femur)[2] <- "RMR"
-colnames(femur)[3] <- "vascular.density"
-colnames(femur)[4] <- "ost.density"
-colnames(femur)[5] <- "ost.area"
-colnames(femur)[6] <- "ost.shape"
-#here I log transform the data in columns 2,4,5,6  and # log1p(x) = ln(1+x) – convenient for null or very small values for collumn 3
-
-femur1 <- femur[,c(2,4:6)]<-log(femur[,c(2,4:6)]); femur[,3]<-log1p(femur[,3])
-
-Species <- (femur$Species)
-RMR <- log(femur$RMR)
-logVD <- log1p(femur$vascular.density)
-logROD <- log(femur$ost.density)
-logOA <- log(femur$ost.area)
-logOS <- log(femur$ost.shape)
-
-#here I combine all transformed data
-FEMURDATA <- cbind(Species, RMR, logVD, logROD, logOA, logOS)
-
-
-
-
-
-colnames(editedfemur)[1] <- "RMR"
-
-grloc <- getGraphLocations(Ftree,editedfemur[is.na(editedfemur[,"RMR"]),"Species"])
-
-
-
-sporder <- match(attr(grloc$x,"vlabel")[grloc$x$vertex$Species],editedfemur[,"Species"])
-
-
-
-
-```
-
-
-#```{r}
-PEM
-
-sum(is.na(FEMURDATA[, 1]))
-# Extract eigenvectors from the tree
-grloc <- getGraphLocations(LucasTree,FEMURDATA[is.na(FEMURDATA[,"RMR"]),"Species"])
-
-print(dim(FEMURDATA))
-subset_data <- FEMURDATA[is.na(FEMURDATA[,"RMR"]),"Species"]
-print(dim(subset_data))
-grloc <- getGraphLocations(LucasTree, subset_data)
-
-
-
-sporder <- match(attr(grloc$x,"vlabel")[grloc$x$vertex$species],data[,"species"])
-
-class(FEMURDATA)
-```
-
-
-
-head(complete)
-grloc <- getGraphLocations(phylofemurtree,data[is.na(data[,"RMR"]),"Species"])
-
-phylofemurtree<- as.phylo(femurtree)
-
-head(femurtree)
-str(complete)
-
-SpecieswithNA <- c("Calyptosuchus wellesi", "Lesothosaurus diagnosticus",	
-"Troodon formosus", "Allosaurus fragilis","Rutiodon carolinensis", "Maiasaura peeblesorum",	
-"Proterosuchus fergusi")
-grloc <- getGraphLocations(complete, FEMURDATA)
-
-
-grloc <- getGraphLocations(LucasTree,FEMURDATA[,"RMR","Species"])
-
-
-
-str(tpall$Nnode)
-
-head(grloc)
-
-sporder <- match(attr(grloc$x,"vlabel")[grloc$x$vertex$Species],FEMURDATA[,"Species"])
-
+Citing PEM Framework:
+Guénard, Guillaume, Pierre Legendre, and Pedro Peres‐Neto. "Phylogenetic eigenvector maps: a framework to model and predict species traits." Methods in Ecology and Evolution 4.12 (2013): 1120-1131.
 
