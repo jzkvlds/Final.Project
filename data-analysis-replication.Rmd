@@ -4,10 +4,7 @@ author: "Jessica V"
 date: "`r Sys.Date()`"
 output: html_document
 ---
-
-#  *PROJECT NOT YET COMPLETED loading up PDF and imnages now
-
-#   Introduction*
+#   Introduction
 
 # *OBJECTIVE:*
 
@@ -361,32 +358,7 @@ plot(fixingscale)
 ```
 
 
-```{r}
-#Here I filder the full data to remove NA's
-
-
-
-ggplot(fulldata, aes(x = RMR, y = Species)) + 
-   geom_point(shape = 22, size = 4, color = "black", aes(fill = RMR, colour = ifelse(RMR < 1, "light blue", "red"))) +
-   labs( x = "Mass-specific resting metabolic rate") +
-  scale_colour_identity() +
-    scale_fill_identity() +
-     scale_fill_gradient(low = "light blue", high = "red", breaks = c(0, 1, 2, 3, 6, 8, 10, 12), labels = c("0", "1", "2", "3", "6", "8", "10", "12"))+
-   guides(colour = FALSE) + 
-  theme_classic() + 
-  theme(plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), 
-                                "inches")) +
-    theme(legend.position="bottom", legend.key.size = unit(.1, "inches"),
-   legend.key.width = unit(1,"inches"))
-
-#making sure to take out any NA's and I created a new dataset called error bars for that
-
-#Species order
-
-#Here I create the species order found on Figure 1 Part 2.
-```
-
-Here I made sure to use the order in which the species appear on the paper. I manually added the order as Sorder2 and ploted the final plot.
+Here I made sure to use the order in which the species appear on the paper. I manually added the order as Sorder2 and ploted the "final" plot.
 
 ```{r}
 
@@ -413,7 +385,8 @@ This plot how looks like the Right side of Figure 1. Here I insert an image of F
 ```{r}
 knitr::include_graphics("IMAGES/Legendre2016Figure1.png")
 ```
-Analysis Replication: 
+
+# Analysis Replication: 
 
 After an excessive amount of attempts I could not replicate the PEM portion of the paper. Over two weeks later I figured that if my goal is to be able to replicate this type of analysis, I could work with a different dataset form the same author. 
 
@@ -421,12 +394,14 @@ I resorted to trying this analysis on Legendre et al., 2020 and finally succeede
 
 
 # Analysis
-Phylogenetic Eigenvector Map (PEM) is a method used to analyze patterns of evolution in phylogenetic trees. It is based on the idea that traits of closely related species are more similar that those of distantly related species. PEM's can be useful for comparisons with different variables, with correlations between traits, with clustering of species, and of course with providing insight to patterns of trait evolution.
+Phylogenetic Eigenvector Map (PEM) is a method used to analyze patterns of evolution in phylogenetic trees. This method was used in both Legendre et al., 2016 and Legendre et al., 2020. This method is based on the idea that traits of closely related species are more similar than those of distantly related species. PEM's can be useful for comparisons with different variables, with correlations between traits, with clustering of species, and of course with providing insight to patterns of trait evolution.
+
+Legendre et al., 2020, reported a new type of egg that was discovered from ~68 Million years ago. This egg exceeded all nonavian dinosaur eggs in volume and also differs from them in structure. This study showed that the PEM estimate is very low for a giant marine reptile.
 
 
 Predictive Modeling: Phylogenetic Eigenvector Maps (PEM)
 
-Here I load in the dataset and tree data and name them as "TreeP" & "DataP" (I chose P since I am working for the PEM.
+Here I load in the dataset and tree data and name them as "TreeP" & "DataP" (I chose P since I am working for the PEM.)
 
 ```{r}
 treeP<- "/Users/jessicavaldes/Desktop/R2024/Final.Project2024/DATA/Lepidosaurtree.trees.nex"
@@ -448,7 +423,7 @@ datasubset<-subset(dataP, !is.na(V))
 datasubset[,c(3:5,7:9)]<-log(datasubset[,c(3:5,7:9)])
 ```
 
-#### For SVL
+SVL stands for snout–vent length.
 
 Here I match the phylogeny and dataset for the SVL, making sure I drop any NA's and making sure I am subsetting for species.
 ```{r}
@@ -491,19 +466,26 @@ rm(m)
 summary(PEMAIC[["V"]]) 
 ```
 
+When reviewing thse summary of PEMAIC we can see:
+The residuals, which represent the differences between the observed and the predicted values.
+The Coefficients, which represents the estimations of each variable (V).(Inclusing Estimades coefficient values, Standard Errors, T values, and P-values).
+We also see residual standard errors, multiple R-squared and F-Statistics.
+
+In conclusion: the results of the Signif. codes are indeed significant since they are low (the lower the p-values the more significant).
+
+
 #  *Discussion and Reflection*
 
 I believe I did a pretty good job replicating Figure 1, especially when taking into consideration that the author of the author added color, error bars, and the images by hand.
-
 
 
 The biggest challenge was encountered when trying to create the PEM for Legendre et al 2016. It was such a challenge that I could not figure out what was wrong, even when trying to calculate the analysis the same way I calculated the PEM for Legendre 2020.
 
 A dataset that could have also made my life easier, was if the author had loaded a dataset with the complete set of species and RMRs, instead of me having to manually import them. The analysis replications were incredibly difficult as the paper does not mention how any of the calculations were done besides listing what R packages were used for the calculations.
 
-I could not obtain the correct PEM as the author, an it might have to do with the fact that that paper was written in 2016 and R package availability was quite different from then compared to now.
+I could not obtain the correct PEM as the author for Legendre et al., 2016, an it might have to do with the fact that that paper was written in 2016 and R package availability was quite different from then compared to now.
 
-## Summary/Discussion
+
 
 #   Extra
 This section contains extra replications I have done for this project although they did not show up as figures on the paper.
@@ -598,14 +580,18 @@ plot(tibiatreeplot)
 
 #  References
 Citing the dataset:
+
 Legendre, Lucas J.; Guénard, Guillaume; Botha-Brink, Jennifer; Cubo, Jorge (2016). Data from: Palaeohistological evidence for ancestral high metabolic rate in archosaurs [Dataset]. Dryad. https://doi.org/10.5061/dryad.2853k
 
 Citing the paper:
+
 Lucas J. Legendre, Guillaume Guénard, Jennifer Botha-Brink, Jorge Cubo, Palaeohistological Evidence for Ancestral High Metabolic Rate in Archosaurs, Systematic Biology, Volume 65, Issue 6, November 2016, Pages 989–996, https://doi.org/10.1093/sysbio/syw033
 
 Citing second paper:
+
 Legendre, L.J., Rubilar-Rogers, D., Musser, G.M. et al. A giant soft-shelled egg from the Late Cretaceous of Antarctica. Nature 583, 411–414 (2020). https://doi.org/10.1038/s41586-020-2377-7
 
 Citing PEM Framework:
+
 Guénard, Guillaume, Pierre Legendre, and Pedro Peres‐Neto. "Phylogenetic eigenvector maps: a framework to model and predict species traits." Methods in Ecology and Evolution 4.12 (2013): 1120-1131.
 
