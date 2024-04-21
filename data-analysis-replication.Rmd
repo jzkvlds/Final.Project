@@ -24,7 +24,7 @@ Phylogeny relationships, topology and branch length, a well as inner relationshi
 
 1) that Mesozoic theropod dinosaurs exhibit metabolic rates very close to those found in modern birds
 2) that archosaurs share a higher ancestral metabolic rate than that of extant ectotherms
-3)that this derived high metabolic rate was acquired at a much more inclusive level of the phylogenetic tree, among non-archosaurian archosauromorphs.
+3) that this derived high metabolic rate was acquired at a much more inclusive level of the phylogenetic tree, among non-archosaurian archosauromorphs.
 
 Additionally, these results highlight the difficulties of assigning a given heat production strategy, such as endothermy or ectothermy, to an estimated metabolic rate value. The results of the paper also confirmed findings from previous studies which state that the definition of the endotherm/ectotherm dichotomy may be ambiguous.
 
@@ -32,7 +32,9 @@ Additionally, these results highlight the difficulties of assigning a given heat
 
 
 The PEM approach was selected to estimate mass-specific RMR (in mL O2 h−1 g−0.67 ) in this study, using bone histological data and phylogenetic information to convert the phylogeny into PEMs and predict values of the dependent variable for fossil species.
+
 Three predictive models were done for each of the three elements (femur, humerus, and tibia), to maintain a strict frame of homology.
+
 Ancestral states of RMR were reconstructed from both observed and predicted values, using a phylogeny of the complete sample.
 
 # *ANALYSIS REPLICATED*
@@ -229,6 +231,7 @@ allSpeciesRMR <- drop_na(allsSpeciesRMR)
 
 allSpeciesRMR1 <- allSpeciesRMR %>% distinct(Species, .keep_all = TRUE)
 ```
+
 Now that I have all of the data together I can generate the plot.
 Here I plot RMR on the x-axis and Species on the Y-axis
 I make sure the shapes are squares (shape 15)
@@ -265,7 +268,9 @@ knitr::include_graphics("IMAGES/TABLE1.png")
 
 
 Here I manually add the data from Table 1 (Species, RMR, UL, and LL), and cbind them into a dataframe called missingspecies. I then convert to the same type of data and join this data with the previous data above into a dataframe called full data.
+
 ```{r}
+
 Species <- c("Prolacerta broomi", "Proterosuchus fergusi", "Garjainia madiba", "Euparkeria capensis", "Rutiodon carolinensis", "Calyptosuchus wellesi", "Postosuchus kirkpatricki", "Lesothosaurus diagnosticus", "Maiasaura peeblesorum", "Thecodontosaurus antiquus", "Coelophysis bauri", "Lourinhanosaurus antunesi", "Allosaurus fragilis", "Troodon formosus")
 RMR<- c(1.779574478, 0.742796421, 1.428587942, 1.388275876, 0.395353151, 1.707702381, 1.864455587, 1.130079749, 0.861329988, 1.002164215, 11.83642213, 2.285600254, 5.889620032, 3.301842183)
 LL <- c(1.319254894,0.604057894, 1.093892708, 1.05448569, 0.308843779, 1.135032404, 1.165933134, 0.78543557, 0.532978612, 0.760912118, 7.44819231, 1.624566141, 3.680724942, 2.388193685)
@@ -334,6 +339,7 @@ plot(FIGURE1)
 ```
 
 I made sure RMR, UL, amd LL were numeric and added the errorbars to the plot naming it fixingscale.
+
 ```{r}
 fulldata$RMR<-as.numeric(fulldata$RMR)
 fulldata$UL<-as.numeric(fulldata$UL)
@@ -381,12 +387,44 @@ plot(final)
 
 ```
 
-This plot how looks like the Right side of Figure 1. Here I insert an image of Figure 1 from the paper to view for comparison.
+This plot now looks like the Right side of Figure 1. Here I insert an image of Figure 1 from the paper to view for comparison.
+
 ```{r}
 knitr::include_graphics("IMAGES/Legendre2016Figure1.png")
 ```
 
 # Analysis Replication: 
+
+Statistical Analysis.
+
+For my statistical Analysis I replicated the tree in Figure 2.
+
+Here I load the complete tree,
+
+a then load the data I want: RMR (I name it fullRMR) and finally map the tree.
+```{r}
+completetree <- read.nexus(file =   "/Users/jessicavaldes/Desktop/R2024/Final.Project2024/DATA/Treecomplete.trees.nex")
+
+head(completetree)
+
+
+fullRMR <- fulldata %>%
+  mutate(RMR = set_names(RMR, Species)) %>%
+  pull(RMR)
+
+
+names(fullRMR) <- completetree$tip.label
+
+
+colortree <- contMap(completetree, fullRMR, plot = FALSE)
+
+plot(
+  colortree, 
+  legend = 0.7*max(nodeHeights(phylocomplete)),
+  fsize = c(0.5, 0.7))
+
+```
+
 
 After an excessive amount of attempts I could not replicate the PEM portion of the paper. Over two weeks later I figured that if my goal is to be able to replicate this type of analysis, I could work with a different dataset form the same author. 
 
@@ -394,6 +432,7 @@ I resorted to trying this analysis on Legendre et al., 2020 and finally succeede
 
 
 # Inferential Analysis
+
 Phylogenetic Eigenvector Map (PEM) is a method used to analyze patterns of evolution in phylogenetic trees. This method was used in both Legendre et al., 2016 and Legendre et al., 2020. This method is based on the idea that traits of closely related species are more similar than those of distantly related species. PEM's can be useful for comparisons with different variables, with correlations between traits, with clustering of species, and of course with providing insight to patterns of trait evolution.
 
 Legendre et al., 2020, reported a new type of egg that was discovered from ~68 Million years ago. This egg exceeded all nonavian dinosaur eggs in volume and also differs from them in structure. This study showed that the PEM estimate is very low for a giant marine reptile.
@@ -417,13 +456,14 @@ head(dataP)
 
 
 Here I subset the data and log transform it.
+
 ```{r}
 
 datasubset<-subset(dataP, !is.na(V))
 datasubset[,c(3:5,7:9)]<-log(datasubset[,c(3:5,7:9)])
 ```
 
-SVL stands for snout–vent length.
+Note: in this case SVL stands for snout–vent length.
 
 Here I match the phylogeny and dataset for the SVL, making sure I drop any NA's and making sure I am subsetting for species.
 ```{r}
@@ -436,6 +476,7 @@ sporder <- match(attr(grloc$x,"vlabel")[grloc$x$vertex$species],datasubset[,"Spe
 ```
 
 Here I build the PEM
+
 ```{r}
 PEMfs <- list()
 PEMfs[["V"]] <- PEM.fitSimple(y=datasubset[sporder,"SVL"],
@@ -493,6 +534,7 @@ This section contains extra replications I have done for this project although t
 
 I once again read the NEXUS file, converted to phylo object, plotten tree using ggtree by adding tip labels and applyina tree like theme.,
 
+Here I plot the Femur Tree
 ```{r}
 t <- "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreefemurMeta.nex"
 
@@ -508,7 +550,7 @@ femurtreeplot <-(ggtree(phylofemurtree) +
 plot(femurtreeplot)
 ```
 
-
+Here I plot the femur tree with rotated nodes.
 ```{r}
 
 t <- "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreefemurMeta.nex"
@@ -524,6 +566,7 @@ ggtree(phylofemurtree) +
   theme_tree()     
 
 plot(femurtree)
+
 plot(femurtree, use.edge.length=FALSE)
 nodelabels()
 
@@ -547,10 +590,17 @@ femurtree<- rotate.multi(femurtree, 38)
 femurtree<- rotate.multi(femurtree, 39)
 femurtree<- rotate.multi(femurtree, 40)
 femurtree<- rotate.multi(femurtree, 41)
+
+plot(femurtree)
+
+finalfemurtree<-compute.brlen(femurtree, length =1)
+
+plot(finalfemurtree)
 ```
 
 
 Humerus tree shown here.
+
 ```{r}
 humerustree <- read.nexus(file = "/Users/jessicavaldes/Desktop/R2024/FINAL.PROJECT/TreehumerusMeta.nex")
 
@@ -563,6 +613,7 @@ humerustreeplot <- (ggtree(phylohumerustree) +
 
 plot(humerustreeplot)
 ```
+
 Tibia Tree plotted below
 
 ```{r}
@@ -577,7 +628,6 @@ tibiatreeplot <-(ggtree(phylotibiatree) +
 
 plot(tibiatreeplot)
 ```
-
 
 #  References
 Citing the dataset:
