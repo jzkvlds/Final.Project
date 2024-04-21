@@ -69,6 +69,7 @@ library(dplyr)
 library(nlme)
 library(nortest)
 library(RColorBrewer)
+library(rphylopic)
 ```
 
 #  *Visualization of Data*
@@ -415,13 +416,87 @@ fullRMR <- fulldata %>%
 
 names(fullRMR) <- completetree$tip.label
 
-
 colortree <- contMap(completetree, fullRMR, plot = FALSE)
+
+#set color
+
+colortree <- setMap(colortree, colors=c("blue", "green", "light green" , "yellow", "orange", "red"))
+
 
 plot(
   colortree, 
   legend = 0.7*max(nodeHeights(phylocomplete)),
   fsize = c(0.5, 0.7))
+
+
+```
+
+Here I add silhouettes (although they were placed by hand in the original paper).
+
+First I extract the images I want for each species using uuid. 
+
+```{r}
+
+
+uuid <- get_uuid(name = "gallus gallus", n = 1)
+
+img <- get_phylopic(uuid = uuid)
+
+plot(img)
+
+uuid2 <- get_uuid(name = "allosaurus fragilis", n = 1)
+
+img2 <- get_phylopic(uuid = uuid2)
+
+plot(img2)
+
+uuid3 <- get_uuid(name = "crocodylus niloticus", n = 1)
+
+img3 <- get_phylopic(uuid = uuid3)
+
+plot(img3)
+
+uuid4 <- get_uuid(name = "pelodiscus sinensis", n = 1)
+
+img4 <- get_phylopic(uuid = uuid4)
+
+plot(img4)
+
+uuid5 <- get_uuid(name = "mus musculus", n = 1)
+
+img5 <- get_phylopic(uuid = uuid5)
+
+plot(img5)
+
+uuid6 <- get_uuid(name = "proterosuchus fergusi", n = 1)
+
+img6 <- get_phylopic(uuid = uuid6)
+
+plot(img6)
+
+uuid7 <- get_uuid(name = "euparkeria capensis", n = 1)
+
+img7 <- get_phylopic(uuid = uuid7)
+
+plot(img7)
+```
+
+Once I find the images I wasnt, I add it to the plot by using add_phylopic_base:
+
+```{r}
+plot(
+  colortree,
+  legend = 0.7*max(nodeHeights(phylocomplete)),
+  fsize = c(0.5, 0.7)) 
+  add_phylopic_base(uuid = uuid, x = 380, y = 28, ysize = 2.5, fill = "orange")
+
+  add_phylopic_base(uuid = uuid2, x = 350, y = 24.5, ysize = 2.5, fill = "yellow")
+  
+   add_phylopic_base(uuid = uuid3, x = 380, y = 18, ysize = 5.2, fill = "light blue")
+   add_phylopic_base(uuid = uuid4, x = 390, y = 10, ysize = 2, fill = "blue")
+add_phylopic_base(uuid = uuid5, x = 390, y = 4, ysize = 2.5, fill = "lime green")
+add_phylopic_base(uuid = uuid6, x = 190, y = 13, ysize = 2, fill = "dark green")
+add_phylopic_base(uuid = uuid7, x = 200, y = 15, ysize = 1.5, fill = "green")
 
 ```
 
